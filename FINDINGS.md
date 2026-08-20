@@ -64,3 +64,71 @@ Whether they also carry unusable *counts* is not yet established.
 Whether a 5-minute collection interval — the practical free-tier cadence — is
 good enough. That depends on how long a stockout actually lasts, which is not
 yet measured. It is the next task, and the answer is not assumed here.
+
+---
+
+## M0-T3 — What history exists, and where it must be processed
+
+**Method.** Full listing of the public `tripdata` bucket, parsed rather than
+eyeballed; schema read from a 2.8 MB Jersey City file rather than by downloading
+a 1 GB NYC one.
+
+### Inventory
+
+| | |
+|---|---|
+| Monthly NYC files | **31**, `2024-01` through **`2026-07`**, 21.9 GB |
+| Yearly NYC archives | 11, `2013`–`2023`, 7.1 GB |
+| Jersey City files | 111, 0.16 GB — a separate, much smaller system |
+| **Total** | **~29 GB** |
+
+History is current to last month, and reaches back thirteen years.
+
+### The download rate decides where the work runs
+
+Measured against the bucket from this machine: **0.76 MB/s.**
+
+| | At 0.76 MB/s |
+|---|---|
+| One month (~950 MB) | ~21 minutes |
+| All monthly files | **~8 hours** |
+| Everything | ~11 hours |
+
+Pulling 29 GB onto a laptop to produce a few megabytes of counts is the wrong
+shape. **Bulk download and aggregation belong in CI, where the runner sits next
+to the bucket**, and only the aggregates come back. This is a measurement, not a
+preference — and it was worth taking before designing the pipeline around a
+local copy.
+
+### One month is missing most of its data
+
+`2026-04` is **164.6 MB**, against 574.8 MB in March and 917.0 MB in May. Ridership
+does not fall by two thirds in April and then quadruple in May.
+
+Either the file is truncated or April was genuinely disrupted. **Not yet
+established which** — but any month-over-month figure spanning April is suspect
+until it is, and no analysis may quietly average across it.
+
+### Trip schema
+
+13 columns: `ride_id`, `rideable_type`, `started_at`, `ended_at`,
+`start_station_name`, `start_station_id`, `end_station_name`, `end_station_id`,
+`start_lat`, `start_lng`, `end_lat`, `end_lng`, `member_casual`.
+
+Timestamps carry milliseconds. One row per trip; departures and arrivals must be
+derived from the two ends of the same row.
+
+### Open, and blocking: can a trip be tied to a live station?
+
+The whole project depends on joining historical demand to live outages. The two
+sources do not obviously agree on identity:
+
+| Source | Identifier |
+|---|---|
+| Live feed | `station_id` — **1,812 UUIDs and 696 numeric strings**, mixed |
+| Live feed | `short_name` — `2377.01`, present on all 2,508 |
+| Trip files | `start_station_id` — `HB102`, `JC009` in the Jersey City sample |
+
+`short_name` is the likely bridge, with station `name` as a fallback. **Until the
+match rate is measured on a real NYC month, the project has no established link
+between demand and availability, and that is the next thing to settle.**
