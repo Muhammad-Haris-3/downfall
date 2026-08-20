@@ -1,0 +1,21 @@
+{
+  "month": "202602",
+  "source_file": "202602.zip",
+  "rows_raw": 1219444,
+  "dropped": {
+    "started_at_unparseable": 0,
+    "started_at_dst_ambiguous": 0,
+    "ended_at_unparseable": 0,
+    "ended_at_dst_ambiguous": 0
+  },
+  "departures_counted": 1218325,
+  "arrivals_counted": 1211386,
+  "station_hours": 600259,
+  "distinct_stations": 2277,
+  "utc_span": [
+    "2026-01-31 04:00:00+00:00",
+    "2026-03-01 04:00:00+00:00"
+  ],
+  "output": "data\\marts\\trip_counts_202602.parquet",
+  "output_bytes": 1856207
+}
