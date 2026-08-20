@@ -1,0 +1,128 @@
+name: aggregate
+
+# Turn the public trip archive into per-station, per-hour counts.
+#
+# This runs on a CI runner rather than a laptop because of a measurement, not a
+# preference: the archive is 22.5 GB and a home connection managed 0.76 MB/s
+# (FINDINGS M0-T3), which is eight hours for the monthly files alone. The runner
+# sits next to the bucket. Nothing large is ever copied to a development machine
+# and no source zip is kept after the counts are extracted.
+#
+# Idempotent by design. `list_months.py` subtracts the months that already have a
+# manifest, so a re-run costs one API call and does nothing, and a newly
+# published month is picked up automatically - the archive appears about three
+# days after the month it covers ends.
+
+on:
+  workflow_dispatch:
+    inputs:
+      all:
+        description: "Rebuild every month, including ones already done"
+        type: boolean
+        default: false
+  schedule:
+    # The 6th of each month, comfortably after the ~3-day publication lag.
+    - cron: "40 5 6 * *"
+
+concurrency:
+  group: downfall-aggregate
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      months: ${{ steps.list.outputs.months }}
+      count: ${{ steps.list.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - id: list
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event.inputs.all }}" = "true" ]; then
+            MONTHS=$(python pipeline/list_months.py --all)
+          else
+            MONTHS=$(python pipeline/list_months.py)
+          fi
+          echo "months=$MONTHS" >> "$GITHUB_OUTPUT"
+          echo "count=$(echo "$MONTHS" | python -c 'import json,sys; print(len(json.load(sys.stdin)))')" >> "$GITHUB_OUTPUT"
+          echo "to aggregate: $MONTHS"
+
+  aggregate:
+    needs: plan
+    if: needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      # One month per job. A failure on 2025-07 must not cost 2025-08 its run,
+      # and the manifest check means the next invocation retries only the gaps.
+      fail-fast: false
+      matrix:
+        month: ${{ fromJson(needs.plan.outputs.months) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install -r requirements.txt
+      - name: aggregate ${{ matrix.month }}
+        run: python pipeline/aggregate_trips.py ${{ matrix.month }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mart-${{ matrix.month }}
+          path: data/marts/*_${{ matrix.month }}.*
+          retention-days: 1
+
+  commit:
+    needs: [plan, aggregate]
+    # `always()` so that a partial run still lands the months that did succeed.
+    # Losing thirty good marts because one month failed would mean re-downloading
+    # twenty gigabytes to recover from a transient error.
+    if: always() && needs.plan.outputs.count != '0'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - uses: actions/download-artifact@v4
+        with:
+          path: /tmp/marts
+          pattern: mart-*
+          merge-multiple: true
+      - name: collect and verify
+        run: |
+          set -euo pipefail
+          mkdir -p data/marts
+          cp -f /tmp/marts/* data/marts/ 2>/dev/null || true
+          # A mart without its manifest has no record of what was dropped on the
+          # way in, and FR-14 makes that unusable. Refuse it rather than commit
+          # a file that cannot be accounted for.
+          for f in data/marts/trip_counts_*.parquet; do
+            [ -e "$f" ] || continue
+            m="data/marts/manifest_$(basename "$f" .parquet | sed 's/trip_counts_//').json"
+            if [ ! -e "$m" ]; then echo "orphan mart with no manifest: $f"; exit 1; fi
+          done
+          python pipeline/summarise_marts.py
+      - name: commit
+        run: |
+          set -euo pipefail
+          git config user.name  "downfall-aggregator"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/marts/
+          if git diff --cached --quiet; then
+            echo "no new marts"
+            exit 0
+          fi
+          python pipeline/summarise_marts.py --commit-message > /tmp/msg.txt
+          git commit -F /tmp/msg.txt
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && break
+            sleep 5
+          done
+          git push origin "HEAD:${GITHUB_REF_NAME}"

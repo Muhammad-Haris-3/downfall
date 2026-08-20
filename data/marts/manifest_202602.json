@@ -1,6 +1,10 @@
 {
   "month": "202602",
   "source_file": "202602.zip",
+  "source_members": [
+    "202602-citibike-tripdata_1.csv",
+    "202602-citibike-tripdata_2.csv"
+  ],
   "rows_raw": 1219444,
   "dropped": {
     "started_at_unparseable": 0,
@@ -16,6 +20,6 @@
     "2026-01-31 04:00:00+00:00",
     "2026-03-01 04:00:00+00:00"
   ],
-  "output": "data\\marts\\trip_counts_202602.parquet",
+  "output": "trip_counts_202602.parquet",
   "output_bytes": 1856207
 }

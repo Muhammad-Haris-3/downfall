@@ -26,8 +26,13 @@ data/state/*
 !data/runs.ndjson
 !data/stations.json
 
-# Marts are rebuildable from the source bucket; their manifests are not, and a
-# few KB of provenance is the only record of how a given mart was produced.
+# Marts ARE tracked, despite being derived. Rebuilding one means pulling ~750 MB
+# from the bucket, so a repository that carries them is a repository someone can
+# actually reproduce the analysis from. They are ~2 MB a month and a closed month
+# never changes again, so the history does not grow on rewrites.
+# The manifests are tracked for a different reason: they are the only record of
+# what was dropped on the way in, and cannot be regenerated at all (SRS FR-14).
 !data/marts/
 data/marts/*
 !data/marts/manifest_*.json
+!data/marts/trip_counts_*.parquet
