@@ -1,0 +1,28 @@
+{
+  "month": "202507",
+  "source_file": "202507.zip",
+  "source_members": [
+    "202507-citibike-tripdata_1.csv",
+    "202507-citibike-tripdata_2.csv",
+    "202507-citibike-tripdata_3.csv",
+    "202507-citibike-tripdata_4.csv",
+    "202507-citibike-tripdata_5.csv"
+  ],
+  "rows_raw": 4988053,
+  "dropped": {
+    "started_at_unparseable": 0,
+    "started_at_dst_ambiguous": 0,
+    "ended_at_unparseable": 0,
+    "ended_at_dst_ambiguous": 0
+  },
+  "departures_counted": 4985056,
+  "arrivals_counted": 4967654,
+  "station_hours": 1141840,
+  "distinct_stations": 2264,
+  "utc_span": [
+    "2025-06-30 03:00:00+00:00",
+    "2025-08-01 03:00:00+00:00"
+  ],
+  "output": "trip_counts_202507.parquet",
+  "output_bytes": 3580179
+}
