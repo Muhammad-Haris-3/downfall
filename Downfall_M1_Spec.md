@@ -38,7 +38,7 @@ it was not negligible.
 | # | Task | Output |
 |---|---|---|
 | **M1-T1** | Aggregate the full trip archive in CI | 31 monthly marts, one manifest each |
-| **M1-T2** | Resolve the `2026-04` anomaly | A stated cause, or a documented exclusion |
+| **M1-T2** | Resolve the `2026-04` anomaly | ✅ **Done.** Compression, not truncation. Retained in full |
 | **M1-T3** | Build the station-hour censoring join | Outage minutes per station-hour |
 | **M1-T4** | Measure censoring exposure | The §6 criterion, with an interval |
 | **M1-T5** | Characterise concentration | Share of censoring held by the worst stations |

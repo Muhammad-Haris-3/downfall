@@ -371,3 +371,55 @@ known as any other.
 - The poll interval is asserted to be `>= 60` (the feed's declared `ttl`) and
   `< 70` (its publish cycle). Both bounds have a reason, and the test states it.
 - The thresholds in `PREREGISTRATION.md` §3 are asserted to still be there.
+
+---
+
+## M1-T2 — April is not missing data. It is the only month anybody compressed
+
+The anomaly flagged in M0-T3: `2026-04` is 164.6 MB against 574.8 MB in March and
+917.0 MB in May. The obvious reading was a truncated upload.
+
+**Method.** A zip stores its index at the end of the file, so a range request for
+the last 400 KB lists every member and its uncompressed size. 200 KB fetched
+instead of 164 MB, and no month downloaded at all.
+
+| Month | zip | **CSV inside** | ratio | ~trips |
+|---|---|---|---|---|
+| 2026-03 | 574.8 MB | 574.8 MB | 1.00 | 2.95M |
+| **2026-04** | **164.6 MB** | **753.5 MB** | **0.22** | **3.87M** |
+| 2026-05 | 917.0 MB | 917.0 MB | 1.00 | 4.70M |
+
+**April holds more data than March, not less.** Its trip count sits exactly where
+the seasonal ramp puts it. Checked across all 31 months: **every other month has a
+ratio of 1.00** — the CSVs are *stored*, not deflated — and April alone is
+actually compressed. It also uses a different member naming convention
+(`-part1.csv` rather than `_1.csv`), so it was packaged by a different process.
+
+**The anomaly was in the container, never the contents.** Inferring data volume
+from file size was the error, and it would have excluded a complete month.
+
+`2026-04` is **retained in full**. The M0-T3 flag is withdrawn.
+
+### The full archive, measured rather than assumed
+
+| | |
+|---|---|
+| Monthly files, 2024-01 → 2026-07 | **31** |
+| Uncompressed | **22.5 GB** |
+| **Trips** | **~115.2 million** |
+
+Row counts are estimated from bytes at 194.9 B/row, calibrated against 2026-02
+which was downloaded and counted in full. The estimate returns **1,219,290**
+against a true **1,219,444** — an error of 0.01%, which is what makes the table
+above worth quoting at all.
+
+### A new flag, replacing the one just withdrawn
+
+**February 2026 is 40% below February 2025** — 1.22M trips against 2.03M. January
+is down 15% and March only 7%. February 2026 is specifically unusual, and it is
+**the month M0-T4 and M0-T5 used for the join rate and the commute-peak check.**
+
+Neither result plausibly depends on volume: a join rate is a ratio, and the
+commute peak is a shape. But both were established on an atypical month, and that
+is recorded here rather than discovered later. **M1 re-runs both on a normal
+month before either is relied on.**
