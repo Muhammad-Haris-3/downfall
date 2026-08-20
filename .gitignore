@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+.next/
+.env
+.env.local
+
+# Raw probe captures are large and re-collectable; findings are committed, not inputs.
+data/*.jsonl.gz
+data/*.parquet
