@@ -252,3 +252,68 @@ the busiest stations — the ones the project is about.
 Absent means zero. That is safe only for a station that existed and was open in
 that hour, which is a separate question this pipeline deliberately does not
 answer — see the open item in M0-T4 about stations that opened after February.
+
+---
+
+## M0-T6 — Half of stockouts clear within ten minutes, and that sets the cadence
+
+**Method.** 3.0 hours of continuous collection, **Thursday 20 August, 15:50–18:50
+New York time** — the evening peak. 155 published files, zero failed requests.
+Durations estimated by Kaplan–Meier, so that outages still open when collection
+stopped count as *at least this long* rather than being discarded.
+
+Dropping them would have been the easy mistake: they are disproportionately the
+long ones, and throwing them out roughly halves the answer.
+
+| | empty | full |
+|---|---|---|
+| Usable outages | 224 | 858 |
+| Ended within the window | 194 | 681 |
+| Still open at the end | 30 | 177 |
+| **Median duration** | **9.9 min** | **13.8 min** |
+| 25th percentile | 4.7 min | 5.3 min |
+| 75th percentile | 25.6 min | 47.8 min |
+| Still unusable after 1 hour | 16.0% | 21.3% |
+
+### The decision this settles
+
+| | empty | full |
+|---|---|---|
+| Ends within one 70s publish cycle | **0.4%** | 0.6% |
+| Ends within 5 minutes | 26.3% | 23.7% |
+
+**Almost nothing is invisible.** Only ~0.5% of outages are shorter than a single
+publish cycle, so the feed's own 70-second rhythm is fast enough to see
+essentially every event. The measurement floor from M0-T1 is not a real
+constraint here.
+
+But a quarter of outages clear inside five minutes, so **a collector that samples
+once every five minutes would blur about one in four.** The fix is the pattern
+already used in Headway: don't sample on the cron, *run continuously between*
+crons. A job that collects for 59 of every 60 minutes is blind for ~1.7% of the
+day, against ~10% for a job that collects 4½ minutes out of every 5. Fewer, longer
+jobs beat many short ones, because the loss lives at the boundaries.
+
+### Two things this does NOT establish
+
+**One evening is not a day.** 15:50–18:50 is the evening peak — when bikes pile
+up in residential docks and drain from commercial ones. Morning is the same
+process reversed, and 3am is neither. **Every figure above is an evening figure**
+and none should be quoted as a daily rate.
+
+**The long tail is cut off.** Nothing lasting more than three hours could be seen
+to end. 16% of empty outages were still running at one hour and 10.9% at two, so
+the tail is heavy and the true upper quantiles are worse than the table shows.
+The median is solid; the 75th percentile is a floor.
+
+### An early asymmetry, recorded but not yet believed
+
+**Full docks outnumbered empty ones almost four to one** — 858 against 224 — and
+lasted 40% longer. On this evidence the harder problem is not finding a bike, it
+is finding somewhere to put one.
+
+That is exactly what an evening peak should look like, which is why it is not yet
+a finding. If it survives a morning and a weekend, it becomes one.
+
+**Only 127 of 2,508 stations ran empty at all**, and the busiest 10% of those
+accounted for a quarter of all empty outages. Scarcity is concentrated, not spread.
