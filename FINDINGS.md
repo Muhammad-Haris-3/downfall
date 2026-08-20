@@ -132,3 +132,55 @@ sources do not obviously agree on identity:
 `short_name` is the likely bridge, with station `name` as a fallback. **Until the
 match rate is measured on a real NYC month, the project has no established link
 between demand and availability, and that is the next thing to settle.**
+
+---
+
+## M0-T4 — The join holds: 98.1% of trips reach a live station
+
+The blocking question from M0-T3. Measured on February 2026 — **1,219,444 trips**,
+2,214 distinct start stations — against the live station list.
+
+`short_name` is the bridge. The live `station_id` is not: it is 1,812 UUIDs and
+696 numeric strings, and appears nowhere in the trip files.
+
+| | |
+|---|---|
+| Stations matched | 2,181 of 2,214 — **98.5%** |
+| **Trips matched** | 1,194,777 of 1,218,325 — **98.07%** |
+| Trips with no station id at all | 1,119 — 0.09% |
+
+**The project is possible.** Historical demand can be tied to live availability
+for essentially the whole network.
+
+### What the missing 1.9% is
+
+33 stations, 23,548 trips. They ran in February and are absent from the live feed
+today — retired or renamed in the six months since. Eight of them still match a
+live station **by name** while their `short_name` has changed, which is a rename,
+not a closure.
+
+Name is therefore a usable second pass, and it is deliberately not applied yet:
+a name-only match is weaker evidence than an id match, and mixing the two without
+recording which was used would make the join impossible to audit later.
+
+### The other direction, which is the more interesting one
+
+**327 live stations recorded zero trips in February.** Two different causes, and
+they must not be pooled:
+
+- **53 stations report `capacity = 0`.** Checked against the outages collected so
+  far: they have produced **no** empty, full or offline rows, so they are not
+  currently corrupting the record. Worth re-checking as coverage grows — a
+  zero-capacity station reporting zero bikes forever would otherwise read as a
+  permanent stockout and inflate every scarcity figure in the project.
+- **The remaining ~274 have real capacity.** The likely explanation is that they
+  opened between February and today; the live list is current, the trips are six
+  months old. **Not established** — it needs a recent month to confirm, and until
+  then no station is to be described as "new".
+
+### Consequence for the design
+
+The unit of analysis is `short_name`, not `station_id`. Station identity is
+**not stable over time** — ids are reissued on rename — so every join must be
+dated, and a station's history must be assembled by id *as of* the month in
+question rather than by today's id.
