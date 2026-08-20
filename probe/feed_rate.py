@@ -29,7 +29,7 @@ KEEP = ("num_bikes_available", "num_ebikes_available", "num_docks_available",
 
 def poll():
     """One read of the feed. Returns (our clock, {station_id: fields})."""
-    req = urllib.request.Request(FEED, headers={"User-Agent": "shortfall-probe/0.1"})
+    req = urllib.request.Request(FEED, headers={"User-Agent": "downfall-probe/0.1"})
     with urllib.request.urlopen(req, timeout=20) as r:
         payload = json.load(r)
     wall = time.time()

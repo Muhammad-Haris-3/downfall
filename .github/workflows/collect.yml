@@ -1,0 +1,76 @@
+name: collect
+
+# One job an hour, collecting for 59 of the 60 minutes.
+#
+# The cadence follows FINDINGS M0-T6: half of stockouts clear inside ten minutes
+# and a quarter inside five, so a collector that SAMPLES every five minutes would
+# blur one in four. What matters is not how often the job starts but how much of
+# the clock it is actually watching - so the job runs almost the whole hour, and
+# the only blind spot is the handover.
+#
+#   run 4.5 min of every 5   ->  24 handovers/hour  ->  ~10% of the day blind
+#   run 59 min of every 60   ->   1 handover/hour   ->  ~1.7% of the day blind
+#
+# Same gap either way; far fewer of them. GitHub's cron is best-effort and will
+# skip runs under load - that is not worked around because it cannot be. Each run
+# appends its own coverage to data/runs.ndjson, so a gap is visible as a gap
+# rather than reading as an hour in which no station ever ran out.
+
+on:
+  schedule:
+    - cron: "2 * * * *"
+  workflow_dispatch:
+    inputs:
+      minutes:
+        description: "How long to collect for"
+        default: "59"
+
+# Two collectors must never run at once: both would hold their own idea of which
+# outages are open, and each would write opens for the other's closes.
+concurrency:
+  group: downfall-collect
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 75          # 59 of collection, and room to commit
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: collect
+        run: python collector/collect.py ${{ github.event.inputs.minutes || '59' }}
+
+      - name: commit the record
+        run: |
+          set -euo pipefail
+          git config user.name  "downfall-collector"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+
+          if git diff --cached --quiet; then
+            echo "nothing collected this hour - not committing an empty change"
+            exit 0
+          fi
+
+          # The commit subject carries the run's own numbers, so the history is
+          # readable as a coverage log without opening a single file.
+          python collector/summarise_run.py > /tmp/msg.txt
+          git commit -F /tmp/msg.txt
+
+          # Rebase rather than merge: the event log is append-only, so a
+          # concurrent commit is always a different set of lines at the end of a
+          # file and replays cleanly. A merge commit here would be noise.
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && break
+            echo "rebase attempt $attempt failed, retrying"
+            sleep 5
+          done
+          git push origin "HEAD:${GITHUB_REF_NAME}"

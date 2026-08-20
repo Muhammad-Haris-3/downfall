@@ -1,0 +1,6 @@
+# The collector deliberately uses only the standard library. It runs every hour
+# forever, and a dependency it does not have cannot break it at 3am.
+
+# Trip aggregation only.
+pandas>=2.2
+pyarrow>=16

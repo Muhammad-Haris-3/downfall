@@ -317,3 +317,57 @@ a finding. If it survives a morning and a weekend, it becomes one.
 
 **Only 127 of 2,508 stations ran empty at all**, and the busiest 10% of those
 accounted for a quarter of all empty outages. Scarcity is concentrated, not spread.
+
+---
+
+## M0-T7 — The collector rebuilt as an append-only log, and two bugs it exposed
+
+The SQLite prototype stored one row per outage and edited it on recovery. That is
+fine on a laptop and wrong in CI: an outage opens in one hourly job and closes in
+a later one, so every run would rewrite history, and "append-only" would be a
+promise made by careful code rather than a property of the store.
+
+**Nothing is now ever rewritten.** Two events are appended - `open` and `close` -
+and an outage is the pair. Public git history is the audit trail; a change to a
+past line is a diff in a public commit.
+
+### Bug 1: events filed under the wrong day
+
+Events were filed by the timestamp they carried. But `last_reported` is *when the
+station last checked in*, and a station that stopped reporting in May still
+carries a May timestamp.
+
+Result: one three-minute test wrote to **twelve files**, dated from 2026-05-28 to
+2026-08-20. An hour of collection would have touched months of history on every
+run - the precise thing the redesign was meant to make impossible.
+
+Events are now filed by the day we **observed** them. The event's own timestamp
+is kept in the record, where it belongs.
+
+### Bug 2: outages already running when we first looked
+
+On a cold start, 283 of 287 outages were already underway. Their apparent start
+is the moment we first saw them, which is a lower bound wearing a measurement's
+clothes - and the arithmetic gives a perfectly plausible duration either way.
+
+Such opens are now flagged `o`, and any duration built from them is refused. The
+same flag is applied after a gap longer than **10 minutes**, since an outage may
+have begun at any point inside it. A normal one-minute handover is *not* flagged:
+a minute sits inside the feed's own ~122s reporting lag, so the start is as well
+known as any other.
+
+### What the tests hold
+
+15 tests, and most exist because the mistake was made rather than imagined:
+
+- A switched-off station classifies as `offline`, never `empty`. It reports zero
+  bikes, and 53 stations report zero capacity permanently — pooling them would
+  manufacture shortage that never happened.
+- An outage with an unseen start still computes a duration, **and is still
+  refused**.
+- Two opens with no close between them raise, rather than silently overwriting
+  and producing a plausible outage of the wrong length.
+- Writing to the log twice leaves the first bytes byte-identical.
+- The poll interval is asserted to be `>= 60` (the feed's declared `ttl`) and
+  `< 70` (its publish cycle). Both bounds have a reason, and the test states it.
+- The thresholds in `PREREGISTRATION.md` §3 are asserted to still be there.

@@ -7,11 +7,27 @@ node_modules/
 .env
 .env.local
 
-# Everything under data/ is either re-downloadable from the source bucket, or a
-# live capture that changes every minute. Neither belongs in version control.
+# Deny everything under data/, then name what is allowed back in. A 237 MB
+# source zip was committed here once by accident; an allow-list is the version
+# of this file that could not have let that happen.
 data/*
+
+# The collected record. This IS the project's output and belongs in git - the
+# commit history is what makes the log append-only in a way a reader can check
+# without trusting the code that wrote it.
+!data/events/
+data/events/*
+!data/events/*.ndjson
+
+!data/state/
+data/state/*
+!data/state/open.json
+
+!data/runs.ndjson
+!data/stations.json
+
+# Marts are rebuildable from the source bucket; their manifests are not, and a
+# few KB of provenance is the only record of how a given mart was produced.
 !data/marts/
 data/marts/*
-# Manifests are the exception: a few KB each, and they are the provenance record
-# for how a mart was built. Losing them loses the audit trail.
 !data/marts/manifest_*.json
