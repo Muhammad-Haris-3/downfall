@@ -184,3 +184,71 @@ The unit of analysis is `short_name`, not `station_id`. Station identity is
 **not stable over time** — ids are reissued on rename — so every join must be
 dated, and a station's history must be assembled by id *as of* the month in
 question rather than by today's id.
+
+---
+
+## M0-T5 — A month of trips compresses 125x, and the clock is provably right
+
+**Method.** February 2026 aggregated to per-station, per-hour counts.
+237 MB zip in, **1.9 MB parquet out** — a 125x reduction with nothing needed for
+the analysis discarded.
+
+| | |
+|---|---|
+| Raw trips | 1,219,444 |
+| Departures counted | 1,218,325 |
+| Arrivals counted | 1,211,386 |
+| Station-hours stored | 600,259 |
+| **All 31 months, projected** | **~59 MB** |
+
+**Thirteen years of demand fits inside a free 500 MB tier**, with room to spare.
+That settles the storage question for the demand side.
+
+### The commute peak validates the time zone conversion
+
+Trip timestamps are naive **local** New York time; the live feed publishes a
+**UTC** epoch. Mixing them silently misaligns every join by four or five hours,
+and nothing about the output would look wrong.
+
+Weekday departures by local hour, after conversion:
+
+```
+  05    10,317  #####
+  06    25,370  ############
+  07    48,035  #######################
+  08    72,835  ####################################   <- morning peak
+  ...
+  16    69,880  ##################################
+  17    92,749  ##############################################   <- evening peak
+  18    79,822  #######################################
+  03     1,682                                          <- trough
+```
+
+Peak at **08:00 and 17:00**, trough at **03:00**. That is the shape of commuting,
+and it is only recoverable if the conversion is correct — an error of a few hours
+would put the "morning peak" in the middle of the night. Weekends peak at
+**14:00** instead, with no twin peaks at all, which is the shape of leisure.
+
+**The clock is not asserted to be right. It reproduces a pattern whose answer was
+known in advance** — the same test as a single-look A/B returning 5%.
+
+### Two gaps, both counted rather than smoothed
+
+- **1,119 trips (0.09%)** carry no start station. They are excluded from
+  departures and reported, not dropped in silence.
+- **6,939 more trips arrive nowhere** than depart nowhere — 0.57%. Every trip
+  starts somewhere identifiable more reliably than it ends. Cause not yet
+  established; it is small, and it is recorded because a 0.57% asymmetry that
+  turns out to concentrate at particular stations would matter.
+
+### Departures and arrivals are counted independently
+
+A trip whose end is unusable still proves a bike **left**. Discarding the whole
+row would understate demand exactly where the data is messiest, which tends to be
+the busiest stations — the ones the project is about.
+
+### 60% of station-hours are empty of trips and are not stored
+
+Absent means zero. That is safe only for a station that existed and was open in
+that hour, which is a separate question this pipeline deliberately does not
+answer — see the open item in M0-T4 about stations that opened after February.
