@@ -423,3 +423,50 @@ Neither result plausibly depends on volume: a join rate is a ratio, and the
 commute peak is a shape. But both were established on an atypical month, and that
 is recorded here rather than discovered later. **M1 re-runs both on a normal
 month before either is relied on.**
+
+---
+
+## M1-T0 — When M1 can actually report, measured from the publisher's own history
+
+The trip archive covers whole months and appears after they end. How long after
+was not known, and it decides when the censoring join can be computed at all —
+that join needs trips and outages from the **same** period, and outage collection
+only began on 2026-08-20.
+
+**Method.** `LastModified` on each object in the bucket, against the last day of
+the month it covers.
+
+| Month | Published | Lag |
+|---|---|---|
+| 2026-03 | 2026-04-03 | 2 days |
+| 2026-04 | 2026-05-04 | 3 days |
+| 2026-05 | 2026-06-04 | 3 days |
+| 2026-06 | 2026-07-06 | 5 days |
+| 2026-07 | 2026-08-12 | 11 days |
+
+**Median over the last twelve months: 3 days.** Far shorter than assumed, and the
+one 11-day outlier is worth remembering when scheduling anything against it.
+
+### Consequence
+
+| Deliverable | Available |
+|---|---|
+| Exposure **E** — share of station-hours censored | **~11 Sept 2026**, on outage data alone |
+| Departure-weighted exposure | **~4 Oct 2026**, once September's trips are published |
+| First overlap of trips and outages | ~4 Sept 2026, covering 20–31 August only — 12 days, below the §3 floor |
+
+**The kill criterion can still fire on schedule**, because the population it names
+— the top 200 stations by departures — can be fixed from trip history that
+already exists.
+
+### The cohort rule, fixed now, before the outage window closes
+
+> **The top-200 cohort is the 200 stations with the most departures across
+> 2025-08 to 2026-07** — the twelve complete months preceding collection —
+> identified by `short_name`, fixed once, and never redefined.
+
+Defining it from data that **precedes** the measurement window is not a
+convenience. Choosing the cohort from the same period whose censoring is being
+measured would select stations partly on the outcome, and the exposure figure
+would be biased upward by construction. Recorded here so the rule cannot be
+adjusted once E is known.

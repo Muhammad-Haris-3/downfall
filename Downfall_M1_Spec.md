@@ -161,6 +161,32 @@ one of the 168 hour-of-week slots observed at least three times.
 M1-T1, T2 and T7 depend on trip data only and proceed immediately. T3 through T6
 wait.
 
+### 5.1 Amendment, 2026-08-21: what the publication lag permits
+
+Added after measuring the archive's publication lag (FINDINGS M1-T0) and before
+any exposure figure exists.
+
+The archive appears a median of **3 days** after the month it covers. Outage
+collection began 2026-08-20, so the first month of trips overlapping it publishes
+around 4 September and covers only 20–31 August — below the §3 floor.
+
+The milestone therefore splits:
+
+| | Depends on | Available |
+|---|---|---|
+| **Exposure E, and the §6 gate** | Outage data + a cohort from prior trips | **~11 Sept 2026** |
+| Departure-weighted exposure | Contemporaneous trips | **~4 Oct 2026** |
+
+**The §6 exit criterion fires on the first of these**, because the population it
+names can be fixed from trip history that already exists:
+
+> **The top-200 cohort is the 200 stations with the most departures across
+> 2025-08 to 2026-07**, identified by `short_name`, fixed once, never redefined.
+
+Defining the cohort from months that *precede* the measurement window is
+deliberate. Selecting it from the same period whose censoring is measured would
+pick stations partly on the outcome and bias E upward by construction.
+
 ---
 
 ## 6. Exit criterion
