@@ -7,6 +7,11 @@ node_modules/
 .env
 .env.local
 
-# Raw probe captures are large and re-collectable; findings are committed, not inputs.
-data/*.jsonl.gz
-data/*.parquet
+# Everything under data/ is either re-downloadable from the source bucket, or a
+# live capture that changes every minute. Neither belongs in version control.
+data/*
+!data/marts/
+data/marts/*
+# Manifests are the exception: a few KB each, and they are the provenance record
+# for how a mart was built. Losing them loses the audit trail.
+!data/marts/manifest_*.json
