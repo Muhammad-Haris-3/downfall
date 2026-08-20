@@ -1,1 +1,2 @@
 {"run":"d15bae5e2e0c","start":1787267826,"end":1787268007,"files":3,"requests":3,"not_modified":0,"errors":0,"suspected_skips":0,"opened":287,"closed":4,"closed_in_gap":0,"still_open":283,"events":291,"gap_s":null,"cold_start":1,"starts_uncertain":1}
+{"run":"b4e62a0f0d84","start":1787268275,"end":1787268455,"files":3,"requests":3,"not_modified":0,"errors":0,"suspected_skips":0,"opened":6,"closed":11,"closed_in_gap":7,"still_open":278,"events":17,"gap_s":268,"cold_start":0,"starts_uncertain":0}
