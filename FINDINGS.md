@@ -595,3 +595,85 @@ the next run appears — and if the schedule remains unreliable the design has t
 absorb it rather than assume it away, which is what `data/runs.ndjson` and the
 gap flags exist for. **Coverage is measured, not promised**, and the §3 floor of
 the pre-registration is enforced on measured coverage.
+
+---
+
+## M2-T0 — The estimator works in principle, and the first test of it was rigged
+
+**This is preliminary and does not satisfy `PREREGISTRATION.md` §4.** That section
+requires synthetic censoring drawn from the *observed* outage pattern of a matched
+station, and the outage record is not yet deep enough. The patterns here are
+generated. What this establishes is whether the method works at all — and now is
+the safest moment to ask, because there is no exposure figure yet to want a
+particular answer.
+
+Six months, 199 stations of the fixed cohort, **760,783 station-hours**.
+
+### Three methods
+
+| | |
+|---|---|
+| **naive** | `λ = D`. Do nothing. What essentially every published analysis of this dataset does, and the thing the project claims is wrong |
+| **scaled** | `λ = D / (1 − f)`. The obvious correction |
+| **em** | Poisson `level[station] × shape[hour-of-week]`, fitted on what was observable, used to fill what was not, refitted |
+
+### Results, over censored hours only
+
+**Uniform censoring** — outage minutes placed at random, 15.0% of hours, mean f 0.35:
+
+| method | median abs err | median signed | |
+|---|---|---|---|
+| naive | 33.3% | **−33.3%** | |
+| scaled | 17.1% | +2.1% | pass |
+| em | 18.4% | +4.1% | pass |
+
+**Demand-driven censoring** — simulated minute by minute, 1.8% of hours, mean f 0.23:
+
+| method | median abs err | median signed | |
+|---|---|---|---|
+| naive | 13.6% | **−13.6%** | |
+| scaled | 6.4% | +5.3% | pass |
+| em | **5.4%** | −4.1% | pass |
+
+**The naive count is not noisy. It is wrong in one direction**, by 13% to 33%,
+and the direction is the one that hides the problem: it understates demand
+exactly where demand could not be recorded. That is the project's premise,
+reproduced under conditions where the true answer was known.
+
+Both corrections clear the pre-registered thresholds in both regimes. `em` wins
+the realistic regime; `scaled` wins the artificial one, which is the ordering one
+would want — the simple method is built for the easy case.
+
+### The first version of this test was circular, and it flattered the answer
+
+The original demand-driven simulator computed `f = lost / truth`. That makes
+`observed = truth × (1 − f)` **true by construction** — and `scaled` inverts
+exactly that identity. It scored **4.7%** on a test that had been handed the
+answer.
+
+Replaced with a mechanistic simulation: demand and returns are spread across the
+minutes of the hour, stock is walked forward, and a departure meeting an empty
+dock is lost. **Both `observed` and `f` are now outputs of that process** rather
+than related by an identity the estimator can exploit.
+
+`scaled` fell from 4.7% to 6.4%. The gap is small — and it was entirely the
+simulator marking its own homework.
+
+### A bug that only surfaced because numpy is strict
+
+The marts store `dow_local` as `int8` to keep 30.6M rows small. Computing
+hour-of-week as `dow * 24 + hour` overflows for Saturday: **6 × 24 = 144 wraps to
+−112.**
+
+`np.bincount` rejects negative indices, so it raised. **A slightly different
+expression would not have.** It would have folded Saturday's hours silently into
+Wednesday's and produced a perfectly plausible weekly profile, wrong in a way no
+output inspection would reveal. The regression test names the day.
+
+### Still unestablished
+
+- Whether the real outage patterns behave like either simulated regime.
+- Whether never-stockout stations resemble the stations the estimator will be
+  applied to — SRS §3.2, and the reason §4 matches on capacity and departures.
+- Anything about exposure. **M1 measures the hole; this only shows a tool that
+  can fill a hole of known size.**

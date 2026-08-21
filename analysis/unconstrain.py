@@ -84,7 +84,13 @@ def em(df, f_col="empty_frac", iters=25, tol=1e-5):
     open_frac = np.maximum(1.0 - f, EPS)
 
     st_idx, st_keys = pd.factorize(df["station"], sort=True)
-    how = (df["dow_local"].to_numpy() * 24 + df["hour_local"].to_numpy()).astype(int)
+    # Cast BEFORE multiplying. The marts store dow_local as int8 to keep 30M
+    # rows small, and 6 * 24 = 144 overflows int8 to -112 - which np.bincount
+    # rejects, loudly, only because it happens to refuse negatives. A slightly
+    # different expression would have silently mixed Saturday into Wednesday.
+    dow = df["dow_local"].to_numpy().astype(np.int32)
+    hod = df["hour_local"].to_numpy().astype(np.int32)
+    how = dow * 24 + hod
     n_st, n_how = len(st_keys), 168
 
     # Start from the naive counts. Any starting point converges; this one makes
