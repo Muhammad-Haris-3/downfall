@@ -1,20 +1,35 @@
 name: collect
 
-# One job an hour, collecting for 59 of the 60 minutes.
+# A long job, triggered often, so that a missed trigger costs almost nothing.
 #
 # The cadence follows FINDINGS M0-T6: half of stockouts clear inside ten minutes
 # and a quarter inside five, so a collector that SAMPLES every five minutes would
 # blur one in four. What matters is not how often the job starts but how much of
-# the clock it is actually watching - so the job runs almost the whole hour, and
-# the only blind spot is the handover.
+# the clock it is actually watching.
 #
-#   run 4.5 min of every 5   ->  24 handovers/hour  ->  ~10% of the day blind
-#   run 59 min of every 60   ->   1 handover/hour   ->  ~1.7% of the day blind
+# The first design ran 59 minutes of every 60. It made two mistakes, and the
+# second only became visible when the scheduler did not cooperate:
 #
-# Same gap either way; far fewer of them. GitHub's cron is best-effort and will
-# skip runs under load - that is not worked around because it cannot be. Each run
-# appends its own coverage to data/runs.ndjson, so a gap is visible as a gap
-# rather than reading as an hour in which no station ever ran out.
+#   1. It produced 24 handovers a day - 24 chances to lose the boundary of an
+#      outage - when the job length could simply have been longer.
+#   2. It made every hour depend on its own cron firing. GitHub's scheduler is
+#      best-effort, and on this repository it had not fired at all after two
+#      windows. Under that design, a missed trigger is a missed hour.
+#
+# So: the job now runs up to 5h50m (the platform cap is 6h), and the cron still
+# fires hourly. The concurrency group holds at most one run in flight and one
+# queued, so each hourly trigger that lands while a job is running simply
+# reserves the next slot - and the successor starts within seconds of the
+# incumbent finishing, instead of after a minute of nothing.
+#
+#   run 59 min of every 60   ->  24 handovers/day, and 24 crons that must fire
+#   run 5h50m, cron hourly   ->   ~4 handovers/day, and ANY ONE of 24 crons
+#                                 firing is enough to keep collection alive
+#
+# GitHub skipping runs is still not worked around, because it cannot be. It is
+# absorbed: five of every six triggers can be dropped with no loss at all. Each
+# run appends its own coverage to data/runs.ndjson, so what actually happened is
+# measured rather than assumed.
 
 on:
   schedule:
@@ -27,10 +42,15 @@ on:
     inputs:
       minutes:
         description: "How long to collect for"
-        default: "59"
+        default: "350"
 
 # Two collectors must never run at once: both would hold their own idea of which
 # outages are open, and each would write opens for the other's closes.
+#
+# `cancel-in-progress: false` is doing more work here than it looks. GitHub keeps
+# at most one run pending per group, superseding older pending ones - so the
+# hourly trigger does not build a queue, it keeps exactly one successor warm and
+# ready to start the moment the incumbent exits.
 concurrency:
   group: downfall-collect
   cancel-in-progress: false
@@ -38,7 +58,9 @@ concurrency:
 jobs:
   collect:
     runs-on: ubuntu-latest
-    timeout-minutes: 75          # 59 of collection, and room to commit
+    # The platform cap is 360. 350 of collection leaves ten minutes to commit
+    # and push, and a job killed at the cap would lose its run record entirely.
+    timeout-minutes: 358
     permissions:
       contents: write
 
@@ -49,32 +71,32 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: collect
-        run: python collector/collect.py ${{ github.event.inputs.minutes || '59' }}
-
-      - name: commit the record
+      - name: collect, checkpointing every 30 minutes
         run: |
-          set -euo pipefail
+          set -uo pipefail
           git config user.name  "downfall-collector"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/
 
-          if git diff --cached --quiet; then
-            echo "nothing collected this hour - not committing an empty change"
-            exit 0
-          fi
+          MINUTES="${{ github.event.inputs.minutes || '350' }}"
+          python collector/collect.py "$MINUTES" &
+          COLLECTOR=$!
 
-          # The commit subject carries the run's own numbers, so the history is
-          # readable as a coverage log without opening a single file.
-          python collector/summarise_run.py > /tmp/msg.txt
-          git commit -F /tmp/msg.txt
-
-          # Rebase rather than merge: the event log is append-only, so a
-          # concurrent commit is always a different set of lines at the end of a
-          # file and replays cleanly. A merge commit here would be noise.
-          for attempt in 1 2 3; do
-            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && break
-            echo "rebase attempt $attempt failed, retrying"
-            sleep 5
+          # The collector stays ONE run for the whole job. That matters: a run
+          # boundary is where outages get flagged as having an unobserved end,
+          # and restarting the process every half hour to get a commit would
+          # manufacture twelve of those a day for no reason. The commit is taken
+          # around the running process instead.
+          i=0
+          while kill -0 "$COLLECTOR" 2>/dev/null; do
+            sleep 30
+            i=$((i + 1))
+            if [ $((i % 60)) -eq 0 ]; then
+              bash .github/scripts/commit_data.sh checkpoint || true
+            fi
           done
-          git push origin "HEAD:${GITHUB_REF_NAME}"
+          wait "$COLLECTOR"
+          echo "collector exited with $?"
+
+      - name: commit the record
+        if: always()
+        run: bash .github/scripts/commit_data.sh final
