@@ -30,6 +30,24 @@ export function generateStaticParams() {
   return net.network.filter((s) => s.top200).map((s) => ({ id: s.s }));
 }
 
+/** The station's own name in the tab and in any shared link, not the site's. */
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const { net } = load();
+  const st = net.network.find((s) => s.s === decodeURIComponent(id));
+  if (!st) return { title: "Unknown station — Downfall" };
+  return {
+    title: `${st.n} — Downfall`,
+    description:
+      `${st.dep.toLocaleString()} departures recorded at ${st.n} over twelve ` +
+      `months. How many were prevented by an empty dock is not yet published.`,
+  };
+}
+
 export default async function StationPage({
   params,
 }: {
