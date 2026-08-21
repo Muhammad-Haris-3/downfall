@@ -36,3 +36,9 @@ data/state/*
 data/marts/*
 !data/marts/manifest_*.json
 !data/marts/trip_counts_*.parquet
+
+# Web app
+web/node_modules/
+web/.next/
+web/out/
+web/next-env.d.ts
