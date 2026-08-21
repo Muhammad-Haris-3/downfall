@@ -14,15 +14,23 @@ an empty dock. That is why almost every published analysis of this dataset reads
 departures as demand, and why the central claim here has to be checkable rather
 than asserted — see `PREREGISTRATION.md` §4.
 
-**Status:** M0 complete, collection running hourly on GitHub Actions. No demand
-estimate exists and no station has been ranked.
+**Status:** M0 complete, M1 in progress. Collection runs on GitHub Actions. No
+demand estimate exists and no station has been ranked.
+
+**Collection cadence:** one job runs up to 350 minutes (platform cap is 360),
+committing a checkpoint every 30 minutes, with the cron firing hourly purely as
+a trigger. The concurrency group holds one run in flight and one queued, so any
+single hourly trigger landing is enough to keep the chain alive - five of six
+can be dropped with no loss. This replaced 59-minute hourly jobs after GitHub's
+scheduler failed to fire at all on this repository; see FINDINGS M1-T8a.
 
 ## Commands
 
 ```bash
 python collector/collect.py 5              # collect for five minutes
 python collector/collect.py                # collect until stopped
-python collector/summarise_run.py          # the commit message CI writes
+python collector/summarise_run.py          # the commit message CI writes at run end
+python collector/checkpoint.py             # is the log safe to commit right now?
 python analysis/duration.py                # Kaplan-Meier over the event log
 python pipeline/aggregate_trips.py data/202602.zip
 python -m pytest tests/ -v
@@ -32,7 +40,7 @@ gh workflow run collect.yml -f minutes=3   # trigger a short collection in CI
 ## Architecture
 
 ```
-GBFS station_status  ->  hourly Actions job, 59 min of every 60
+GBFS station_status  ->  Actions job, up to 350 min, cron hourly as a trigger
                      ->  data/events/YYYY-MM-DD.ndjson   append-only open/close
                      ->  data/runs.ndjson                coverage, per run
                      ->  committed back to this repo by the job itself
@@ -74,6 +82,17 @@ states in its own §1 what had already been seen when it was written.
   coverage to `data/runs.ndjson`. GitHub's cron is best-effort and skips runs
   under load; that is not worked around because it cannot be. Expect ~95%, not
   100%.
+- **A checkpoint is not a run.** `data/runs.ndjson` gets its row when the run
+  ends and only then. A mid-run checkpoint that wrote a partial coverage row
+  would count coverage twice, and coverage is the number `PREREGISTRATION.md` §3
+  gates on.
+- **Never commit a torn line.** `checkpoint.py` refuses if any event file does
+  not end on a line boundary. A half-written line in an append-only log is not
+  recoverable by a later append - the next write lands on the same row and both
+  records are lost. Skipping a checkpoint costs nothing.
+- **The collector stays ONE run for a whole job.** Restarting it every half hour
+  to obtain a commit would manufacture twelve unobserved-end flags a day. The
+  commit is taken around the running process instead.
 - **No rate, estimate or ranking is published before `PREREGISTRATION.md` §3** —
   21 continuous days, ≥95% coverage, ≥20,000 completed outages, all 168
   hour-of-week slots seen three times. A provisional figure captioned "early" is

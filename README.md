@@ -98,7 +98,7 @@ GBFS live feed  ·  Citi Bike trip archive  ·  Open-Meteo
    (all keyless, verified 2026-08-20)
         |
         v
-GitHub Actions - one job an hour, collecting 59 minutes of it
+GitHub Actions - a job of up to 350 min, checkpointing every 30
         |
         v
 data/events/YYYY-MM-DD.ndjson     append-only open/close events
