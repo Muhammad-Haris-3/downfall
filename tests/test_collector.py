@@ -115,17 +115,39 @@ def test_empty_and_full_at_one_station_do_not_collide(tmp_path):
     assert outs["full"].end is None
 
 
-def test_a_lost_close_is_raised_not_absorbed(tmp_path):
+def test_a_lost_close_is_counted_and_refused_a_duration(tmp_path):
     """Two opens with no close between them means the log dropped a line.
 
-    Silently overwriting would produce a plausible outage of the wrong length.
+    The outage is kept - it did happen - but its end was not observed, so it
+    carries no usable duration. Silently overwriting would produce a plausible
+    outage of the wrong length, which is the failure being avoided; raising
+    would make two damaged events cost the entire log, which is the failure
+    that actually occurred.
     """
     paths = write_log(tmp_path, [
         {"ev": "open", "st": "a", "k": "empty", "ts": 1000},
         {"ev": "open", "st": "a", "k": "empty", "ts": 2000},
+        {"ev": "close", "st": "a", "k": "empty", "ts": 2600},
     ])
-    with pytest.raises(ValueError):
-        load_outages(paths)
+    stats = {}
+    outs = sorted(load_outages(paths, stats), key=lambda o: o.start)
+    assert stats["lost_closes"] == 1
+    assert len(outs) == 2
+
+    assert outs[0].start == 1000
+    assert outs[0].usable_duration is None, "an unseen end must refuse a duration"
+    # The second outage is intact and must not be penalised for the first.
+    assert outs[1].usable_duration == 600
+
+
+def test_lost_closes_are_zero_on_a_clean_log(tmp_path):
+    paths = write_log(tmp_path, [
+        {"ev": "open", "st": "a", "k": "empty", "ts": 1000},
+        {"ev": "close", "st": "a", "k": "empty", "ts": 1600},
+    ])
+    stats = {}
+    load_outages(paths, stats)
+    assert stats["lost_closes"] == 0
 
 
 # ------------------------------------------------------------- append-only

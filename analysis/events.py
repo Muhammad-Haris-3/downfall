@@ -48,17 +48,38 @@ def iter_events(paths=None):
                     yield json.loads(line)
 
 
-def load_outages(paths=None):
-    """Pair the log into outages, in the order they were observed."""
+def load_outages(paths=None, stats=None):
+    """Pair the log into outages, in the order they were observed.
+
+    `stats`, if given, is filled with counts the caller is expected to publish -
+    at present `lost_closes`, the number of outages whose `close` never reached
+    the log.
+    """
     open_now = {}
     out = []
+    lost_closes = 0
     for ev in iter_events(paths):
         key = (ev["st"], ev["k"])
         if ev["ev"] == "open":
-            # A second open with no close between them would mean the log lost a
-            # close. Surfaced rather than silently overwritten.
+            # A second open with no close between them means the log lost a
+            # close - it happened once, when writes were going to an unlinked
+            # file (FINDINGS M1-T8b).
+            #
+            # This used to raise. Raising was the wrong response: two damaged
+            # events made the entire log unreadable, and the information the
+            # duplicate carries is not nonsense. It says the previous outage
+            # ended at a moment we did not see, which is a thing this schema
+            # already knows how to express.
+            #
+            # So the previous outage is closed with its end unobserved - which
+            # refuses it a duration, exactly as it should - and the count is
+            # reported rather than absorbed.
             if key in open_now:
-                raise ValueError("open without close for {}".format(key))
+                prev = open_now[key]
+                lost_closes += 1
+                out.append(Outage(station=key[0], kind=key[1], start=prev["ts"],
+                                  end=ev["ts"], start_seen=not prev.get("o"),
+                                  end_seen=False))
             open_now[key] = ev
         else:
             o = open_now.pop(key, None)
@@ -72,6 +93,9 @@ def load_outages(paths=None):
     for key, o in open_now.items():
         out.append(Outage(station=key[0], kind=key[1], start=o["ts"], end=None,
                           start_seen=not o.get("o"), end_seen=False))
+    if stats is not None:
+        stats["lost_closes"] = lost_closes
+        stats["outages"] = len(out)
     return out
 
 
