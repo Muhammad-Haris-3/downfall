@@ -1,0 +1,53 @@
+name: web
+
+# Build the site on Linux, on every change that could affect it.
+#
+# Not redundant with building locally. The development machine is Windows and
+# its filesystem is case-insensitive, so an import of `@/components/networkmap`
+# resolves there and fails everywhere else. Vercel builds on Linux. So does
+# this, which means a broken deploy is visible in a pull request rather than
+# in a deployment log nobody is watching.
+
+on:
+  push:
+    paths:
+      - "web/**"
+      - ".github/workflows/web.yml"
+  pull_request:
+    paths:
+      - "web/**"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+
+      - name: build
+        run: npm run build
+
+      - name: the export must contain the pages it claims to
+        run: |
+          set -euo pipefail
+          for page in index.html conditions/index.html method/index.html; do
+            test -f "out/$page" || { echo "missing out/$page"; exit 1; }
+          done
+          # Station pages are generated from the cohort, so an empty run here
+          # means the cohort file did not reach the build - which would deploy a
+          # site whose station links all 404 while the build reported success.
+          n=$(find out/station -name index.html | wc -l)
+          echo "station pages: $n"
+          test "$n" -ge 150 || { echo "expected ~200 station pages, found $n"; exit 1; }
+          du -sh out
