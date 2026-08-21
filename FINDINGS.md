@@ -470,3 +470,53 @@ convenience. Choosing the cohort from the same period whose censoring is being
 measured would select stations partly on the outcome, and the exposure figure
 would be biased upward by construction. Recorded here so the rule cannot be
 adjusted once E is known.
+
+---
+
+## M1-T1 — 115 million trips aggregated, and the clock validated a second way
+
+**Method.** One CI job per month, each downloading its own file next to the
+bucket and deleting it after extracting counts. 30 months ran in parallel and the
+whole archive finished in **about 90 seconds of wall clock**, against the eight
+hours the same work would take over a home connection (M0-T3).
+
+| | |
+|---|---|
+| Months | **31**, 2024-01 → 2026-07 |
+| Raw trips | **115,022,000** |
+| Departures counted | 114,916,337 |
+| Arrivals counted | 114,649,938 |
+| Station-hours | **30,602,910** |
+| Output | **97 MB** |
+| Rows dropped on the way in | 16,062 — **0.014%** |
+
+The byte-based estimate from M1-T2 predicted 115.2M against an actual 115.0M —
+**0.2% high** across the full archive, which is what makes reading a zip's index
+instead of its contents a usable technique rather than a trick.
+
+### Every DST drop is in November, and none is in March
+
+Rows dropped for an unresolvable clock time, by month:
+
+| Month | DST-ambiguous drops |
+|---|---|
+| 2025-01 | 0 |
+| 2025-03 | **0** |
+| 2025-06 | 0 |
+| **2025-11** | **4,124 starts, 4,567 ends** |
+| 2026-03 | **0** |
+
+This asymmetry is the correct behaviour, and it is not obvious.
+
+**Fall-back** repeats an hour: 01:30 on that Sunday happens twice, and a naive
+local timestamp genuinely cannot say which. Those rows are unresolvable and are
+dropped — ~4,000 of them, in November, in both directions.
+
+**Spring-forward** skips an hour: 02:30 does not exist. A clock recording local
+time never produces it, so **there is nothing to drop** — and zero is what
+appears.
+
+A time-zone bug would not respect that distinction. Getting exactly one
+transition to produce drops, in the right direction, on a rule written before the
+data was seen, is an independent check on the conversion that M0-T5's commute
+peak could not provide.
