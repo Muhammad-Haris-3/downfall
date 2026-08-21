@@ -520,3 +520,78 @@ A time-zone bug would not respect that distinction. Getting exactly one
 transition to produce drops, in the right direction, on a rule written before the
 data was seen, is an independent check on the conversion that M0-T5's commute
 peak could not provide.
+
+---
+
+## M1-T7a — The cohort, fixed before the window it will be measured over
+
+`PREREGISTRATION.md` §6 evaluates the kill criterion on "the top 200 stations by
+departures". **Which 200 has to be settled before the censoring figure exists**,
+and not for tidiness:
+
+> A station that stocked out heavily during the measurement window recorded fewer
+> departures during that window. Rank on the same window and such stations are
+> less likely to make the cohort — so the exposure figure, computed over the
+> survivors, is biased downward by exactly the mechanism under study.
+
+Defined instead over **2025-08 to 2026-07**, the twelve complete months preceding
+collection, and written to `data/cohort_top200.json` with a SHA-256 over the
+sorted station list. An analysis quoting a different digest is not quoting this
+cohort.
+
+| | |
+|---|---|
+| Stations with any departure, 12 months | 2,541 |
+| Cohort | **200** — 7.9% of them |
+| **Share of all departures** | **34.7%** |
+| Entry cutoff | 57,781 departures |
+| Busiest station | 165,362 departures |
+
+**Demand is concentrated: 8% of stations carry 35% of it.** That is the first
+network-wide structural fact this project has established, and it decides whether
+the M4 decision layer is worth building — a fleet of three trucks can plausibly
+matter to 200 stations, and could not matter to 2,541.
+
+The generator refuses to overwrite an existing cohort file. Re-deriving it after
+the exposure figure is known is precisely the failure the file exists to prevent.
+
+---
+
+## M1-T3a — The censoring join, and the four rules that make it honest
+
+Built and tested before the outage record is deep enough to run it on, so the
+rules were settled against cases worked out by hand rather than against results.
+
+The join cuts outage intervals against station-hours. Four rules, each of which
+would be invisible if broken, because a wrong answer here is still a plausible
+one:
+
+| Rule | What it prevents |
+|---|---|
+| **`empty` censors departures; `full` censors arrivals.** Never summed | A station with no docks records departures perfectly well. One "unavailability" figure would claim otherwise |
+| **`offline` hours leave the denominator**, rather than entering as hours of zero demand | Dilution of every network rate, growing with the number of broken stations |
+| **An outage with an unobserved boundary contributes no minutes** | A lower bound added into a total gives a total that is neither a bound nor a measurement |
+| **Fractions are of the OBSERVED hour, never the nominal 3,600s** | An hour watched for 20 minutes and empty throughout was empty for all of what we saw. Reporting 33% would describe our collection schedule, not the station |
+
+29 tests now, 14 of them on this join alone, every case checkable with a pen.
+
+---
+
+## M1-T8a — The hourly schedule did not fire, and the likely reason is the minute
+
+The collection workflow was scheduled at `2 * * * *`. **The 00:02 run had still
+not appeared 55 minutes later.** Manual dispatch works, and the workflow reports
+as active, so this is the scheduler rather than the job.
+
+GitHub's cron is best-effort and queues behind every other repository's
+`0 * * * *`. The top of the hour is the most congested slot there is, and :02 is
+inside it.
+
+**Moved to `37 * * * *`.** A minute nobody else picks is the cheapest reliability
+available, and it costs nothing.
+
+This is not treated as fixed. It is a hypothesis with an obvious test — whether
+the next run appears — and if the schedule remains unreliable the design has to
+absorb it rather than assume it away, which is what `data/runs.ndjson` and the
+gap flags exist for. **Coverage is measured, not promised**, and the §3 floor of
+the pre-registration is enforced on measured coverage.

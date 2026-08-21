@@ -18,7 +18,11 @@ name: collect
 
 on:
   schedule:
-    - cron: "2 * * * *"
+    # Deliberately NOT near the top of the hour. GitHub's scheduler is
+    # best-effort and queues behind everyone else's `0 * * * *`; the first run
+    # scheduled here at :02 was still missing 55 minutes later. A minute nobody
+    # else picks is the cheapest available reliability.
+    - cron: "37 * * * *"
   workflow_dispatch:
     inputs:
       minutes:
