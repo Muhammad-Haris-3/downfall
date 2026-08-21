@@ -37,13 +37,13 @@ it was not negligible.
 
 | # | Task | Output |
 |---|---|---|
-| **M1-T1** | Aggregate the full trip archive in CI | 31 monthly marts, one manifest each |
+| **M1-T1** | Aggregate the full trip archive in CI | ✅ **Done.** 31 marts, 115.0M trips, 97 MB |
 | **M1-T2** | Resolve the `2026-04` anomaly | ✅ **Done.** Compression, not truncation. Retained in full |
 | **M1-T3** | Build the station-hour censoring join | Outage minutes per station-hour |
 | **M1-T4** | Measure censoring exposure | The §6 criterion, with an interval |
 | **M1-T5** | Characterise concentration | Share of censoring held by the worst stations |
 | **M1-T6** | Establish the daily and weekly shape | The claim M0 could not make |
-| **M1-T7** | Identify the never-stockout cohort | The held-out truth M2 depends on |
+| **M1-T7** | Identify the never-stockout cohort | The held-out truth M2 depends on. Top-200 cohort ✅ fixed |
 | **M1-T8** | Coverage report | Continuous, public, per `PREREGISTRATION.md` §3 |
 
 ### 3.1 M1-T1 — Aggregate the archive

@@ -54,7 +54,14 @@ Two further departures:
 record of outages; aggregation of the public trip archive to per-station demand;
 estimation of censored demand; validation of that estimator against
 never-stockout stations; a ranking test; a capacity-constrained rebalancing plan;
-a replay simulator; a public site; a decision memo.
+a replay simulator; a decision memo; and a public application of seven surfaces
+specified in §6.5 — a network map, station pages, a nightly plan, a policy
+simulator, a scored prediction register, a conditions view, and an evidence page.
+
+**Declared extensions**, specified in §6.6 and out of scope until M7: service
+equity by neighbourhood, a second city, and discharged e-bikes as a separate
+scarcity. They are written down now so that they are extensions of a stated plan
+rather than discoveries made when the project needed more to say.
 
 **Out of scope:** predicting individual trips; any claim about another city until
 one is added; advice to riders about specific journeys; real-time operations;
@@ -282,14 +289,122 @@ runs continuously from that point.
 | **FR-23** | **Report simulator fidelity against the observed policy alongside every counterfactual it produces** |
 | **FR-24** | Support alternative objectives — total trips served, and equality of service across areas — and report the trade-off as a number |
 
-### 6.5 Publication (M5–M6)
+### 6.5 The application (M5–M6)
+
+Seven surfaces. They are specified individually because "a public site" is not a
+requirement — it is a placeholder that can be satisfied by anything, and this
+project's findings are only worth as much as the reader's ability to check them.
+
+Each surface answers a different question, and each names the reader it is for.
+
+#### 6.5.1 The map — *where is the problem?*
 
 | # | Requirement |
 |---|---|
-| **FR-25** | Publish predicted station failures **before** the period they concern, and score them after |
-| **FR-26** | Public map, per-station pages, policy simulator, and scoreboard |
-| **FR-27** | Two-page decision memo readable without technical background |
-| **FR-28** | Display coverage, and the count of outages excluded for unobserved boundaries, on the public site |
+| **FR-25** | Render every station in the network at its position, on one view of the city |
+| **FR-26** | Colour each station by its **failure rate**, not by its current state. A snapshot is weather; the rate is climate, and the rate is what an operator can act on |
+| **FR-27** | Three legible bands — reliable / intermittent / chronic — with the thresholds stated on the page rather than chosen for visual balance |
+| **FR-28** | Support filtering to `empty` and `full` separately, since they are different failures with different fixes (§6.3, FR-16) |
+| **FR-29** | Show observation coverage for the displayed window, so a pale area is never mistaken for a healthy one |
+
+**Reader:** anyone, in ten seconds. This is the surface that has to work before any
+other one is worth building.
+
+#### 6.5.2 Station pages — *what happens here, and what was never recorded?*
+
+| # | Requirement |
+|---|---|
+| **FR-30** | Per station: departures and arrivals by hour, hours unusable, and capacity |
+| **FR-31** | **Observed demand and estimated true demand on the same axes**, with the gap named. This is the project's central claim, made concrete for one place a reader may know |
+| **FR-32** | The estimate's uncertainty shown, never a bare point |
+| **FR-33** | Hour-of-week profile: which day and which hour this station fails |
+| **FR-34** | The station's own record of excluded outages — unobserved boundaries, low-coverage hours — on the page, not in a footnote |
+
+**Reader:** an operator, or a rider who knows the corner. A number about a place
+someone recognises is checkable in a way a network average is not.
+
+#### 6.5.3 Tonight's plan — *so what should be done?*
+
+| # | Requirement |
+|---|---|
+| **FR-35** | Produce a per-vehicle route: which stations, in what order, how many bikes moved at each |
+| **FR-36** | State the expected gain **in trips served**, not in any modelling metric. An operator is not paid in RMSE |
+| **FR-37** | Show the same plan under the naive demand ranking beside it, so the difference the correction makes is the visible quantity |
+| **FR-38** | Carry the simulator's measured fidelity (FR-23) on the same screen as the gain it is used to claim |
+
+**Reader:** the person deciding where three trucks go. The only surface that ends
+in an instruction.
+
+#### 6.5.4 The simulator — *what if it were different?*
+
+| # | Requirement |
+|---|---|
+| **FR-39** | Replay a real historical day under user-set conditions, returning trips served |
+| **FR-40** | Controls for at minimum: crew size, shift start time, and objective (§6.4, FR-24) |
+| **FR-41** | Present every result as a difference from the observed day, never as an absolute claim about a world nobody ran |
+| **FR-42** | Refuse, visibly, to extrapolate beyond the conditions the simulator was validated on, rather than returning a confident number outside them |
+
+**Reader:** a manager asking "could we do this with two trucks?" — and getting a
+number instead of an opinion.
+
+#### 6.5.5 The scoreboard — *were you right?*
+
+| # | Requirement |
+|---|---|
+| **FR-43** | Publish, for a stated future window, which stations are predicted to fail — **written before the window begins** |
+| **FR-44** | Score each prediction once its outcome exists, and never before |
+| **FR-45** | Show the standing record: hit rate, miss rate, and the baseline of "the same stations as last week", which any useful method must beat |
+| **FR-46** | Every published prediction remains visible after scoring, including the wrong ones. A register holding only its successes is an advertisement |
+
+**Reader:** anyone deciding whether to believe the rest of the site. This is the
+surface that makes the others credible.
+
+#### 6.5.6 Conditions — *what moves demand?*
+
+| # | Requirement |
+|---|---|
+| **FR-47** | Demand and failure rates by weather condition, temperature band, weekday/weekend, and public holiday |
+| **FR-48** | Report these as *associations*, explicitly not as causal claims, except where a design supports the stronger reading |
+| **FR-49** | Charts legible without a statistical background (SC-7) |
+
+**Reader:** the general visitor. Also the honest answer to "isn't this all just
+rain?", which is a fair question and deserves a page rather than a sentence.
+
+#### 6.5.7 The evidence page — *why should this be believed?*
+
+| # | Requirement |
+|---|---|
+| **FR-50** | Show the validation of `PREREGISTRATION.md` §4 in full: the never-stockout cohort, the synthetic censoring, recovered against known, and the thresholds that were set beforehand |
+| **FR-51** | Show it **whatever the result** — a failed validation is published on the same page with the same prominence (FR-20) |
+| **FR-52** | Link every headline figure on the site back to the finding and the commit that produced it |
+
+**Reader:** the sceptic, and the reviewer. Every other page asserts; this one is
+the only page that argues.
+
+#### 6.5.8 Across the whole application
+
+| # | Requirement |
+|---|---|
+| **FR-53** | Coverage, and the count of outages excluded for unobserved boundaries, visible on every page that quotes a rate — not on an "about" page (NFR-5) |
+| **FR-54** | Two-page decision memo readable with no technical background |
+| **FR-55** | No figure appears before its pre-registered floor is met; the site reports progress toward the threshold instead of a provisional number captioned "early" |
+
+### 6.6 Declared extensions (M7+)
+
+Specified now so that they are extensions of a stated plan rather than
+discoveries made when the project needed more to say. Each is out of scope for
+M6 and none is assumed to work.
+
+| # | Requirement | Why it is worth doing |
+|---|---|---|
+| **FR-56** | **Service equity.** Failure rates and censored demand by neighbourhood income and density, using public census geography | Rebalancing that maximises trips served concentrates bikes where trips already are. Whether that leaves particular areas systematically worse served is measurable, and the trade-off against total trips is a number the simulator can produce |
+| **FR-57** | **A second city.** Repeat the pipeline on another system with a public GBFS feed and trip archive | Every result here is New York's until this runs. It is the only requirement that addresses §3.4, and the correction either transfers or it does not — both are findings |
+| **FR-58** | **Electric bikes as separate scarcity.** Treat a discharged e-bike as unavailable stock even when physically present | A dock with bikes nobody can ride is a stockout the current classification cannot see. It would appear in the data as a healthy station with unexplained low demand — the same failure mode as the main project, one level down |
+
+**FR-58 is the most interesting of the three** precisely because it is the same
+error again: stock that exists, cannot be used, and therefore records no demand.
+If the method works at all, it should work there too, and that is a test of the
+method rather than an extension of it.
 
 ---
 
@@ -410,8 +525,10 @@ counterfactual derived from it, and the distinction is never blurred.
 | **M3** | Does the correction change which stations rank as under-served? | Effect size §5 |
 | **M4** | What should tonight's rebalancing do, and what is it worth? | Simulator fidelity reported first |
 | **M5** | Published before the outcome, scored after | A public register with entries that predate their outcomes |
-| **M6** | Map, station pages, simulator, memo | Legibility, SC-7 |
-| **M7** | Does any of it hold in a second city? | Declared, not assumed |
+| **M6** | The seven surfaces of §6.5 | Legibility, SC-7. A reader can state the finding without help |
+| **M7** | Is service equitable, and what does equity cost in trips? | The trade-off reported as a number, not an argument |
+| **M8** | Does any of it hold in a second city? | Declared, not assumed. Addresses §3.4 |
+| **M9** | Is a discharged e-bike an invisible stockout? | The same error one level down — a test of the method, not an extension |
 
 ---
 
@@ -452,9 +569,11 @@ and publishes the negative result with full prominence, if **any** of:
 | **AC-5** | Estimator validated against never-stockout stations, or **withdrawn** |
 | **AC-6** | The ranking test reported with an effect size, whichever way it comes out |
 | **AC-7** | Every counterfactual accompanied by the simulator's fidelity on observed policy |
-| **AC-8** | Predictions published before their outcomes and scored after |
-| **AC-9** | A non-technical reader can state the finding from the memo alone |
-| **AC-10** | Total cost zero |
+| **AC-8** | Predictions published before their outcomes and scored after, **including the wrong ones** |
+| **AC-9** | All seven application surfaces of §6.5 delivered, each answering the question it names |
+| **AC-10** | Coverage and exclusion counts visible on every page that quotes a rate, not on an "about" page |
+| **AC-11** | A non-technical reader can state the finding from the memo alone |
+| **AC-12** | Total cost zero |
 
 ---
 

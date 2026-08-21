@@ -130,7 +130,10 @@ Nothing runs on a laptop and nothing costs anything. The bulk trip archive is
 | **M3** | Does correcting for it change which stations rank as under-served? | — |
 | **M4** | What should tonight's rebalancing do, and what is it worth? | — |
 | **M5** | Published before the outcome, and scored after | — |
-| **M6** | The map, the station pages, the simulator | — |
+| **M6** | The application — seven surfaces, [SRS §6.5](Downfall_SRS_v1.0.md) | — |
+| **M7** | Is service equitable, and what does equity cost in trips? | Declared |
+| **M8** | Does any of it hold in a second city? | Declared |
+| **M9** | Is a discharged e-bike an invisible stockout? | Declared |
 
 ## The honest limits
 
