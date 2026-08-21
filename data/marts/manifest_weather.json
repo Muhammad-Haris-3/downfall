@@ -1,0 +1,28 @@
+{
+  "source": "Open-Meteo archive, keyless",
+  "point": {
+    "lat": 40.7128,
+    "lon": -74.006,
+    "note": "one point for the whole network"
+  },
+  "window": [
+    "2024-01-01",
+    "2026-07-31"
+  ],
+  "hours": 22632,
+  "missing_before_drop": {
+    "temp_c": 0,
+    "precip_mm": 0,
+    "wind_kmh": 0,
+    "humidity": 0
+  },
+  "fields": [
+    "temperature_2m",
+    "precipitation",
+    "wind_speed_10m",
+    "relative_humidity_2m"
+  ],
+  "timezone": "UTC, to join the marts without a second conversion",
+  "output": "weather_hourly.parquet",
+  "output_bytes": 263651
+}

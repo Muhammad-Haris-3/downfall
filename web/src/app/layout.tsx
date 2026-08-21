@@ -17,6 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <span className="name">Downfall</span>
             <nav>
               <a href="/">Network</a>
+              <a href="/conditions/">Conditions</a>
               <a href="/method/">Method</a>
               <a href="https://github.com/Muhammad-Haris-3/downfall">Source</a>
             </nav>

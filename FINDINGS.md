@@ -768,3 +768,75 @@ what it had attempted and false about what had happened, and no amount of
 internal consistency would ever have revealed the difference. The check that
 works is the one that compares two things produced by different mechanisms - and
 that check did not exist until it had already been needed.
+
+---
+
+## M1-T9 — Rain costs more than the obvious calculation says, not less
+
+**Method.** 22,580 network-hours of departures joined to hourly Open-Meteo
+archive weather, 2024-01 to 2026-07. Wet is ≥ 0.2 mm in the hour — below that is
+drizzle the radar records and a rider does not notice.
+
+| | Ratio, wet vs dry | Effect |
+|---|---|---|
+| Naive — all wet hours against all dry hours | 0.698 | **−30.2%** |
+| Like for like — same month, same hour of week | **0.642** | **−35.8%** |
+| 95% interval | 0.625 .. 0.659 | |
+
+1,996 comparable cells, 8,706 hours. Cells containing only wet or only dry hours
+are dropped: they carry no comparison, and including their level would smuggle
+the confounding back in through the mean.
+
+### The direction of the error was predicted wrong
+
+The analysis was written expecting the naive figure to **overstate** the effect —
+the reasoning being that rain falls as readily at 3am as at 6pm, so wet hours
+would be over-represented among quiet ones and some of the shortfall would
+really be the quietness.
+
+**It is the other way round.** The naive number is too small by 5.6 points, and
+correcting for season and hour makes rain look *worse*.
+
+The likely cause, **unverified**: New York's rain is disproportionately summer
+convective rain, and summer carries roughly four times the ridership of winter.
+Wet hours are therefore drawn from the busy end of the year, which flatters them.
+
+This is recorded rather than quietly corrected because the lesson is not
+"control for confounders" — everyone says that. It is that **the direction a
+confounder pushes is not reliably guessable**, so a naive figure cannot be
+treated as a conservative one merely because it feels as though it should be.
+
+### Temperature, on dry hours only
+
+Relative to the same hour-of-week's own average, so the shape of the day is
+already removed. Measured on dry hours so that the cold effect is not partly a
+rain effect.
+
+| Temperature | Ridership | Hours |
+|---|---|---|
+| below 0 °C | **0.46×** | 3,062 |
+| 0–5 °C | 0.65× | 2,756 |
+| 5–10 °C | 0.84× | 2,680 |
+| 10–15 °C | 1.05× | 2,563 |
+| 15–20 °C | 1.24× | 3,064 |
+| **20–25 °C** | **1.37×** | 3,273 |
+| 25–30 °C | 1.36× | 2,069 |
+| above 30 °C | 1.29× | 725 |
+
+**Freezing weather more than halves ridership.** The peak is 20–25 °C, and the
+curve **turns back down above 30 °C** — heat suppresses cycling too, though less
+sharply than cold. A model assuming demand rises monotonically with temperature
+would be wrong at both ends of the range.
+
+### Why this belongs to M1 and not to the demand estimate
+
+Every figure here is built on **observed departures**, which is the quantity this
+project argues understates demand at any station that ran out. So these are
+effects on *recorded trips*, not on demand.
+
+They are still worth having: they describe conditions that move the whole
+network at once, which is exactly what a per-station censoring analysis has to
+be able to hold constant. And the rain result is a clean, checkable instance of
+the failure the project is about — a measure that is obvious, easy, and biased
+in a direction nobody guessed correctly.
+
