@@ -46,6 +46,21 @@ export default function NetworkMap({ stations }: { stations: Station[] }) {
   const mapRef = useRef<import("leaflet").Map | null>(null);
   const layerRef = useRef<import("leaflet").LayerGroup | null>(null);
   const roRef = useRef<ResizeObserver | null>(null);
+  // Markers are rebuilt on every zoom, so the registry is keyed by station and
+  // refilled each draw rather than held across one.
+  const markers = useRef(new Map<string, import("leaflet").CircleMarker>());
+
+  const [query, setQuery] = useState("");
+  const [cursor, setCursor] = useState(0);
+
+  // Substring match on the name, ranked by how busy the station is, so typing
+  // "broadway" surfaces the Broadway people mean before the twenty they do not.
+  const results =
+    query.trim().length < 2
+      ? []
+      : stations
+          .filter((s) => s.n.toLowerCase().includes(query.trim().toLowerCase()))
+          .slice(0, 8);
 
   useEffect(() => {
     let cancelled = false;
@@ -114,6 +129,7 @@ export default function NetworkMap({ stations }: { stations: Station[] }) {
     const layer = layerRef.current;
     if (!layer) return;
     layer.clearLayers();
+    markers.current.clear();
 
     const maxDep = Math.max(...stations.map((d) => d.dep), 1);
     const z = map.getZoom();
@@ -149,11 +165,101 @@ export default function NetworkMap({ stations }: { stations: Station[] }) {
         });
       }
       m.addTo(layer);
+      markers.current.set(st.s, m);
+    }
+  }
+
+  /** Show a station on the map. The same result whether it was clicked or found. */
+  async function reveal(st: Station) {
+    const map = mapRef.current;
+    if (!map) return;
+
+    // A station outside the current filter has no marker to open, so the filter
+    // is lifted rather than the search silently failing on it.
+    if (onlyTop && !st.top200) setOnlyTop(false);
+
+    map.flyTo([st.lat, st.lon], Math.max(map.getZoom(), 15), { duration: 0.7 });
+    map.once("moveend", () => {
+      markers.current.get(st.s)?.openTooltip();
+    });
+    setQuery("");
+    setCursor(0);
+    setHover(st);
+  }
+
+  function onKey(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (!results.length) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setCursor((c) => (c + 1) % results.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setCursor((c) => (c - 1 + results.length) % results.length);
+    } else if (e.key === "Enter") {
+      e.preventDefault();
+      reveal(results[cursor]);
+    } else if (e.key === "Escape") {
+      setQuery("");
     }
   }
 
   return (
     <div>
+      <div style={{ position: "relative", marginBottom: 10 }}>
+        <input
+          value={query}
+          onChange={(e) => { setQuery(e.target.value); setCursor(0); }}
+          onKeyDown={onKey}
+          placeholder="Find a station — try “Broadway” or “Pier”"
+          aria-label="Search stations by name"
+          style={{
+            width: "100%", padding: "10px 14px", fontSize: 15,
+            background: "var(--panel)", color: "var(--ink)",
+            border: "1px solid var(--line)", borderRadius: 8, outline: "none",
+          }}
+        />
+        {query.trim().length >= 2 && (
+          <div
+            style={{
+              position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0,
+              background: "var(--bg)", border: "1px solid var(--line)",
+              borderRadius: 8, overflow: "hidden", zIndex: 500,
+              boxShadow: "0 8px 28px rgba(0,0,0,.35)",
+            }}
+          >
+            {results.length === 0 && (
+              <div style={{ padding: "11px 14px", color: "var(--dim)", fontSize: 14 }}>
+                No station matches “{query.trim()}”.
+              </div>
+            )}
+            {results.map((st, i) => (
+              <button
+                key={st.s}
+                onMouseDown={(e) => { e.preventDefault(); reveal(st); }}
+                onMouseEnter={() => setCursor(i)}
+                style={{
+                  display: "flex", width: "100%", gap: 12, alignItems: "baseline",
+                  padding: "10px 14px", textAlign: "left", cursor: "pointer",
+                  background: i === cursor ? "var(--panel)" : "transparent",
+                  border: "none", borderBottom: "1px solid var(--line)",
+                  color: "var(--ink)", fontSize: 14,
+                }}
+              >
+                <span style={{ flex: 1 }}>{st.n}</span>
+                {st.top200 && (
+                  <span style={{ fontSize: 11, color: "var(--accent)", fontFamily: "var(--mono)" }}>
+                    has a page
+                  </span>
+                )}
+                <span style={{ fontFamily: "var(--mono)", fontSize: 12.5, color: "var(--muted)" }}>
+                  {st.dep.toLocaleString()} · #{st.rank}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div style={{ display: "flex", gap: 16, alignItems: "center", marginBottom: 10, flexWrap: "wrap" }}>
         <label style={{ fontSize: 14, color: "var(--muted)", cursor: "pointer", userSelect: "none" }}>
           <input
