@@ -26,6 +26,16 @@ data/state/*
 !data/runs.ndjson
 !data/stations.json
 
+# The cohort is the population PREREGISTRATION.md §6 evaluates the kill
+# criterion on. It carries a SHA-256 over its own station list for exactly one
+# reason: so a reader can check that the analysis used the cohort it claims to.
+# Leaving it out of the repository makes that claim unverifiable, which is the
+# same as not making it. A test asserts the digest and caught its absence.
+!data/cohort_top200.json
+
+# The preliminary estimator validation. A result, not an input.
+!data/validation_preliminary.json
+
 # Marts ARE tracked, despite being derived. Rebuilding one means pulling ~750 MB
 # from the bucket, so a repository that carries them is a repository someone can
 # actually reproduce the analysis from. They are ~2 MB a month and a closed month
@@ -36,6 +46,10 @@ data/state/*
 data/marts/*
 !data/marts/manifest_*.json
 !data/marts/trip_counts_*.parquet
+# Weather is 257 KB and its manifest was already tracked without it, which left
+# a provenance record for a file nobody else had. The conditions analysis cannot
+# be reproduced from a clone without it.
+!data/marts/weather_hourly.parquet
 
 # Web app
 web/node_modules/

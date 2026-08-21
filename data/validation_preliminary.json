@@ -1,0 +1,68 @@
+{
+ "note": "preliminary: censoring patterns are generated, not drawn from observed outages, so this does NOT satisfy PREREGISTRATION.md \u00a74",
+ "months": [
+  "202602",
+  "202603",
+  "202604",
+  "202605",
+  "202606",
+  "202607"
+ ],
+ "seed": 20260821,
+ "results": [
+  {
+   "regime": "uniform",
+   "method": "naive",
+   "n": 107284,
+   "median_abs_pct": 33.33333333333333,
+   "median_signed_pct": -33.33333333333333,
+   "mean_signed_pct": -35.033440764427404,
+   "passes": false
+  },
+  {
+   "regime": "uniform",
+   "method": "scaled",
+   "n": 107284,
+   "median_abs_pct": 17.099896827240208,
+   "median_signed_pct": 2.1328961470402326,
+   "mean_signed_pct": -0.2860472284260845,
+   "passes": true
+  },
+  {
+   "regime": "uniform",
+   "method": "em",
+   "n": 107284,
+   "median_abs_pct": 18.405831853578203,
+   "median_signed_pct": 4.130254583447683,
+   "mean_signed_pct": 24.783719681536173,
+   "passes": true
+  },
+  {
+   "regime": "demand-driven",
+   "method": "naive",
+   "n": 13514,
+   "median_abs_pct": 13.636363636363635,
+   "median_signed_pct": -13.636363636363635,
+   "mean_signed_pct": -17.496336359541605,
+   "passes": false
+  },
+  {
+   "regime": "demand-driven",
+   "method": "scaled",
+   "n": 13514,
+   "median_abs_pct": 6.382978723404263,
+   "median_signed_pct": 5.263157894736845,
+   "mean_signed_pct": 8.524145773509048,
+   "passes": true
+  },
+  {
+   "regime": "demand-driven",
+   "method": "em",
+   "n": 13514,
+   "median_abs_pct": 5.4419145837993685,
+   "median_signed_pct": -4.124766082372277,
+   "mean_signed_pct": -6.905203061630057,
+   "passes": true
+  }
+ ]
+}
