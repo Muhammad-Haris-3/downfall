@@ -150,6 +150,78 @@ def test_event_log_only_ever_appends(tmp_path, monkeypatch):
     assert len(after) > len(first)
 
 
+def test_writes_survive_the_file_being_replaced_underneath(tmp_path, monkeypatch):
+    """The five-hour data loss, reproduced.
+
+    The checkpoint runs `git pull --rebase --autostash` every 30 minutes while
+    the collector is still writing. Git does not edit in place - it writes a new
+    file and renames it over the old one. A process holding the old handle goes
+    on writing to an unlinked inode: a file with no name, that nothing reads and
+    that disappears when the process exits.
+
+    The collector reported success throughout, because it was counting its own
+    writes rather than checking them, and `save_state` survived by opening a
+    fresh file each time. Eight consecutive checkpoints logged the same frozen
+    event count and nothing failed.
+
+    Simulated here by replacing the file between two writes, which is what the
+    rename amounts to from the log's point of view.
+    """
+    import collector.collect as c
+    monkeypatch.setattr(c, "EVENTS", tmp_path)
+
+    log = EventLog()
+    log.append({"ev": "open", "st": "a", "k": "empty", "ts": 1000})
+    log.flush()
+    path = log.path
+
+    # What git does: a different file now carries this name.
+    replacement = tmp_path / "replacement"
+    replacement.write_text(path.read_text(encoding="utf-8"), encoding="utf-8")
+    path.unlink()
+    replacement.rename(path)
+
+    log.append({"ev": "close", "st": "a", "k": "empty", "ts": 1600})
+    log.flush()
+
+    lines = [l for l in path.read_text(encoding="utf-8").splitlines() if l.strip()]
+    assert len(lines) == 2, "the second write did not reach the named file"
+    assert '"ev": "close"' in lines[1] or '"ev":"close"' in lines[1]
+
+
+def test_the_checkpoint_refuses_when_events_are_missing(tmp_path, monkeypatch):
+    """The guard that was absent while the loss was happening.
+
+    The collector counts an event only after handing it to the log, so fewer
+    lines on disk than it claims means writes are being lost right now. That has
+    to fail the job: a checkpoint that commits a log it knows is short writes
+    the loss into the permanent record and calls it coverage.
+    """
+    import collector.checkpoint as cp
+    monkeypatch.setattr(cp, "HEARTBEAT", tmp_path / "collector.json")
+
+    (tmp_path / "collector.json").write_text(json.dumps(
+        {"run": "x", "expected_events_on_disk": 848, "written_this_run": 848}))
+
+    ok, why = cp.agrees_with_collector(106)
+    assert not ok
+    assert "742 lost" in why
+
+    ok, _ = cp.agrees_with_collector(848)
+    assert ok, "an exact match must pass"
+
+    # Another run's events share the same files, so a surplus is normal.
+    ok, _ = cp.agrees_with_collector(900)
+    assert ok, "more lines than claimed is not a loss"
+
+
+def test_a_missing_heartbeat_is_not_treated_as_loss(tmp_path, monkeypatch):
+    import collector.checkpoint as cp
+    monkeypatch.setattr(cp, "HEARTBEAT", tmp_path / "absent.json")
+    ok, _ = cp.agrees_with_collector(0)
+    assert ok
+
+
 def test_events_are_filed_by_observation_not_by_their_own_timestamp(tmp_path, monkeypatch):
     """A station offline since May carries a May timestamp.
 

@@ -36,6 +36,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 EVENTS = ROOT / "data" / "events"
 STATE = ROOT / "data" / "state" / "open.json"
+HEARTBEAT = ROOT / "data" / "state" / "collector.json"
 RUNS = ROOT / "data" / "runs.ndjson"
 STATIONS = ROOT / "data" / "stations.json"
 
@@ -88,6 +89,30 @@ def load_state():
     return {}
 
 
+def count_events_on_disk():
+    """Lines currently in the event log. Cheap, and the baseline for the guard."""
+    n = 0
+    for p in sorted(EVENTS.glob("*.ndjson")):
+        with p.open("rb") as fh:
+            n += sum(1 for line in fh if line.strip())
+    return n
+
+
+def write_heartbeat(run_id, expected_total, written):
+    """What the collector believes is on disk, for the checkpoint to check.
+
+    The orphaned-handle bug (FINDINGS M1-T8b) was invisible precisely because
+    nothing ever compared the collector's own count against the file it was
+    supposedly writing. Recording the expectation is what turns a silent loss
+    into a failed job.
+    """
+    HEARTBEAT.parent.mkdir(parents=True, exist_ok=True)
+    tmp = HEARTBEAT.with_suffix(".tmp")
+    tmp.write_text(json.dumps({"run": run_id, "expected_events_on_disk": expected_total,
+                               "written_this_run": written, "at": int(time.time())}))
+    tmp.replace(HEARTBEAT)
+
+
 def save_state(open_now):
     STATE.parent.mkdir(parents=True, exist_ok=True)
     tmp = STATE.with_suffix(".tmp")
@@ -101,39 +126,60 @@ def event_path(observed_at):
 
 
 class EventLog:
-    """Append-only. Opens the file for the current UTC day and never seeks.
+    """Append-only, and re-opened by NAME on every write.
 
     Filed by the day we OBSERVED the event, never by the event's own timestamp.
     A station that stopped reporting in May still carries `last_reported` from
     May, and filing by that scattered a single hour of collection across a dozen
     historical files - rewriting months of history on every run, which is the one
     thing an append-only log must not do.
+
+    WHY IT RE-OPENS EVERY TIME, INSTEAD OF HOLDING A HANDLE
+    ------------------------------------------------------
+    It used to keep one handle open for the life of the run. That silently threw
+    away five hours of collection.
+
+    The job checkpoints every 30 minutes, and the checkpoint ran
+    `git pull --rebase --autostash`. Git does not edit a file in place: it writes
+    a new one and renames it over the old. On Linux the old inode is then
+    unlinked, but a process holding it open keeps writing to it happily - to a
+    file with no name, which nothing will ever read and which vanishes when the
+    process exits.
+
+    The collector went on running. `save_state` survived, because it opens a
+    fresh file for every write, so the state file kept updating and the
+    checkpoint kept reporting success with a frozen event count. Nothing failed.
+    See FINDINGS M1-T8b.
+
+    Opening by name for each write costs one syscall a minute and cannot be
+    orphaned, because the name is resolved at write time rather than at open
+    time.
     """
 
     def __init__(self):
-        self.fh = None
         self.path = None
         self.n = 0
+        self._pending = []
 
     def append(self, ev):
-        p = event_path(time.time())
-        if p != self.path:
-            if self.fh:
-                self.fh.close()
-            p.parent.mkdir(parents=True, exist_ok=True)
-            self.fh = p.open("a", encoding="utf-8")
-            self.path = p
-        self.fh.write(json.dumps(ev, separators=(",", ":")) + "\n")
+        self.path = event_path(time.time())
+        self._pending.append(json.dumps(ev, separators=(",", ":")) + "\n")
         self.n += 1
 
     def flush(self):
-        if self.fh:
-            self.fh.flush()
-            os.fsync(self.fh.fileno())
+        """Write everything buffered, to the file that has this NAME right now."""
+        if not self._pending:
+            return
+        p = self.path
+        p.parent.mkdir(parents=True, exist_ok=True)
+        with p.open("a", encoding="utf-8") as fh:
+            fh.write("".join(self._pending))
+            fh.flush()
+            os.fsync(fh.fileno())
+        self._pending = []
 
     def close(self):
-        if self.fh:
-            self.fh.close()
+        self.flush()
 
 
 # ---------------------------------------------------------------- station meta
@@ -232,6 +278,7 @@ def main(minutes=0.0):
     # start we record is a lower bound, and saying so costs one field.
     starts_uncertain = cold or gap is None or gap > HANDOVER_S
 
+    events_at_start = count_events_on_disk()
     n_st, changed = refresh_stations()
     print("run {}: {} stations{}, {} outages carried over, gap {}".format(
         run_id, n_st, " (metadata changed)" if changed else "", len(open_now),
@@ -278,6 +325,7 @@ def main(minutes=0.0):
                     if o or c:
                         log.flush()
                         save_state(open_now)
+                        write_heartbeat(run_id, events_at_start + log.n, log.n)
                     first_file = False
                     if files % 15 == 0:
                         print("  {} files  open:{}  +{} -{}".format(
@@ -290,6 +338,7 @@ def main(minutes=0.0):
     log.flush()
     log.close()
     save_state(open_now)
+    write_heartbeat(run_id, events_at_start + log.n, log.n)
 
     ended = int(time.time())
     RUNS.parent.mkdir(parents=True, exist_ok=True)
@@ -300,6 +349,7 @@ def main(minutes=0.0):
             "errors": errs, "suspected_skips": skips,
             "opened": opened, "closed": closed, "closed_in_gap": gapclosed,
             "still_open": len(open_now), "events": log.n,
+            "events_at_start": events_at_start,
             "gap_s": gap, "cold_start": int(cold),
             "starts_uncertain": int(starts_uncertain),
         }, separators=(",", ":")) + "\n")

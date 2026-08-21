@@ -677,3 +677,94 @@ output inspection would reveal. The regression test names the day.
   applied to — SRS §3.2, and the reason §4 matches on capacity and departures.
 - Anything about exposure. **M1 measures the hole; this only shows a tool that
   can fill a hole of known size.**
+
+---
+
+## M1-T8b — Five hours of collection went into a file with no name
+
+**The checkpoint reported success eight times in a row while it was happening.**
+
+### The symptom
+
+Consecutive checkpoint commits, thirty minutes apart:
+
+```
+09:12  Checkpoint: 590 events, 428 open / 162 closed, 268 still out
+09:42  Checkpoint: 590 events, 428 open / 162 closed, 258 still out
+...
+12:44  Checkpoint: 590 events, 428 open / 162 closed, 273 still out
+```
+
+The event count is frozen. The count of stations currently out is not. Both
+cannot be true: every change of state writes an event.
+
+The last event in the committed log was timestamped **08:07 UTC**. It was 13:00.
+
+### The cause
+
+The job checkpoints every 30 minutes while the collector keeps running, and the
+checkpoint ran `git pull --rebase --autostash`.
+
+**Git does not edit a file in place.** It writes a new one and renames it over
+the old. On Linux the old inode is then unlinked - but a process holding it open
+goes on writing to it perfectly happily, to a file with no name, that nothing
+will ever read, and that disappears when the process exits.
+
+The collector held one append handle for the life of the run. From its first
+checkpoint onward, every event it wrote went into that hole.
+
+### Why nothing failed
+
+Three things conspired, and each was individually reasonable:
+
+- **`save_state` survived**, because it writes atomically - fresh file, then
+  rename - so it opens by name every time. The state file kept updating, which
+  is why "still out" kept moving and the process looked alive.
+- **The collector counted its own writes**, not the file. `log.n` incremented on
+  every append that returned without raising, and writing to an unlinked inode
+  does not raise.
+- **The checkpoint counted the file but had nothing to compare it against.** 590
+  is a perfectly plausible number. Only the fact that it never changed gave it
+  away, and only across eight commits.
+
+### The damage
+
+| Run | Events the collector counted | Events that reached the log |
+|---|---|---|
+| 01:50 → 07:40 (350 min) | **848** | ~106 |
+| 07:40 → ongoing | unknown | 0 since 08:07 |
+
+Roughly **nine hours of observation lost**, and the runs' own coverage rows
+claim the time as covered. Those rows are now wrong in the one direction that
+matters: they overstate what was seen.
+
+### The fix, in three parts
+
+**1. The log re-opens by name on every write.** A name is resolved at write time;
+a handle is resolved once and then trusted forever. One syscall a minute buys
+immunity to the entire class of bug.
+
+**2. The collector publishes what it believes.** It now writes a heartbeat -
+events on disk at run start, plus events written since - and **the checkpoint
+refuses to commit when the file holds fewer lines than that.** A shortfall is
+never acceptable: the collector counts an event only after handing it over, so
+fewer on disk means writes are being lost *right now*. The job fails loudly
+instead of committing a short log and calling it coverage.
+
+**3. The checkpoint pushes first and rebases only if refused.** This collector is
+almost always the only writer, so the push almost always succeeds alone - and a
+rewrite of a working tree that is being actively written to is a thing to avoid
+having at all, not merely to survive.
+
+### What this cost, and what it bought
+
+The lost hours cannot be recovered; the feed publishes the present and keeps no
+history. Collection restarts from a clean state and the affected runs are marked
+in `data/runs.ndjson` as overstating their coverage.
+
+The general lesson is the expensive one. **A process that counts its own outputs
+is not monitoring itself.** Every number the collector reported was true about
+what it had attempted and false about what had happened, and no amount of
+internal consistency would ever have revealed the difference. The check that
+works is the one that compares two things produced by different mechanisms - and
+that check did not exist until it had already been needed.

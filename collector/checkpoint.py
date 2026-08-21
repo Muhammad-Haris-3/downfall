@@ -32,6 +32,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 EVENTS = ROOT / "data" / "events"
 STATE = ROOT / "data" / "state" / "open.json"
+HEARTBEAT = ROOT / "data" / "state" / "collector.json"
 
 RETRIES = 5
 WAIT_S = 3
@@ -70,6 +71,34 @@ def tally():
     return events, opens, closes, still_open
 
 
+def agrees_with_collector(events_on_disk):
+    """Does the log hold what the running collector says it wrote?
+
+    This is the guard that was missing when a checkpoint reported "590 events"
+    eight times in a row while five hours of collection went into an unlinked
+    file (FINDINGS M1-T8b). Nothing failed, because nothing was checking.
+
+    A shortfall is never acceptable: the collector counts an event only after
+    handing it to the log, so fewer lines on disk than it claims means writes
+    are being lost right now. More lines is fine - another run's events are in
+    the same files.
+
+    Returns (ok, message). A missing heartbeat is not a failure: an older
+    collector, or one that has not yet written anything, has nothing to claim.
+    """
+    if not HEARTBEAT.exists():
+        return True, "no heartbeat; nothing claimed"
+    hb = json.loads(HEARTBEAT.read_text())
+    expected = hb.get("expected_events_on_disk")
+    if expected is None:
+        return True, "heartbeat carries no expectation"
+    if events_on_disk < expected:
+        return False, ("collector wrote {} events but only {} are on disk - "
+                       "{} lost".format(expected, events_on_disk,
+                                        expected - events_on_disk))
+    return True, "{} on disk, {} expected".format(events_on_disk, expected)
+
+
 def main():
     whole, torn = files_are_whole()
     if not whole:
@@ -78,6 +107,13 @@ def main():
         return 1
 
     events, opens, closes, still_open = tally()
+
+    ok, why = agrees_with_collector(events)
+    if not ok:
+        # Loud, and fatal. A checkpoint that commits a log it knows is short
+        # would write the loss into the permanent record and call it coverage.
+        print("EVENT LOSS DETECTED: {}".format(why), file=sys.stderr)
+        return 2
     if "--message" in sys.argv:
         print("Checkpoint: {} events, {} open / {} closed, {} still out".format(
             events, opens, closes, still_open))
