@@ -33,16 +33,32 @@ evaluated on, fixed from the twelve months preceding collection so that it
 cannot be influenced by the outages being measured. Generating a page for all
 2,391 stations would imply they are all part of the analysis. They are not.
 
-## The map has no basemap, deliberately
+## The map
 
-Every tile provider wants an API key, and NFR-1 puts the project on free tiers
-with no account anywhere. It is also the better picture: 2,391 dots draw the
-network's own shape, and streets underneath would invite reading the streets
-instead of the data.
+Leaflet, with CARTO's basemap tiles — free, no account, no API key, so NFR-1 is
+satisfied without giving up the map. Attribution is on the map itself.
 
-Web Mercator rather than plain lat/lon — at this latitude the naive projection
-stretches Manhattan noticeably north–south, and it looks subtly wrong to anyone
-who knows the city.
+**An earlier version had no basemap at all**, and the README argued that was
+better: that 2,391 dots draw the city's own shape and streets would only
+distract. That was a rationalisation of a constraint rather than a design
+decision, and it did not survive being looked at. Without streets it read as a
+dot cloud, there was nothing to zoom into, and clicking a station did nothing —
+so the one interaction the whole page exists for was missing.
+
+It was also unnecessary: the constraint never required it, because keyless tile
+providers exist.
+
+Two things that had to be got right and were not, first time:
+
+- **Both axes in the same units.** The bare-SVG version put latitude through
+  Mercator, which returns a dimensionless radian-scale number, while leaving
+  longitude in degrees. The ranges differed by 36.8×, the shared scale took the
+  smaller, and the whole city collapsed into an 18-pixel strip.
+- **`fitBounds` after the container has its real size.** Leaflet computes zoom
+  from the container's current dimensions, and on first paint those are not
+  final. The first attempt framed New Jersey with every station off screen.
+  `invalidateSize()` on the next frame, plus a `ResizeObserver` so the framing
+  survives a window resize.
 
 ## Run it
 
