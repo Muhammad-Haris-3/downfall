@@ -5810,7 +5810,7 @@
 "short": "HB107"
 },
 "2250946729501126742": {
-"cap": 0,
+"cap": 20,
 "lat": 40.6755,
 "lon": -73.90245,
 "name": "Atlantic Ave & Snediker Ave",
@@ -5824,35 +5824,35 @@
 "short": "4120.03"
 },
 "2250946987199164504": {
-"cap": 0,
+"cap": 12,
 "lat": 40.67841,
 "lon": -73.89659,
 "name": "New Jersey Ave & Jamaica Ave",
 "short": "4194.01"
 },
 "2250947145293496720": {
-"cap": 0,
+"cap": 18,
 "lat": 40.68243,
 "lon": -73.89272,
 "name": "Highland Blvd & Bulwer Pl",
 "short": "4299.01"
 },
 "2250947308502253974": {
-"cap": 0,
+"cap": 24,
 "lat": 40.68478,
 "lon": -73.88903,
 "name": "Highland Blvd & Vermont Pl",
 "short": "4372.02"
 },
 "2250947453818380254": {
-"cap": 0,
+"cap": 18,
 "lat": 40.68387,
 "lon": -73.88555,
 "name": "Jamaica Ave & Elton St",
 "short": "4331.04"
 },
 "2250947600560030106": {
-"cap": 0,
+"cap": 14,
 "lat": 40.67966,
 "lon": -73.89204,
 "name": "Van Siclen Ave & Arlington Ave",
@@ -5866,28 +5866,28 @@
 "short": "4259.02"
 },
 "2250948004286955934": {
-"cap": 0,
+"cap": 12,
 "lat": 40.68087,
 "lon": -73.88208,
 "name": "Shepherd Ave & Fulton St",
 "short": "4291.04"
 },
 "2250948126513942572": {
-"cap": 0,
+"cap": 16,
 "lat": 40.67811,
 "lon": -73.89159,
 "name": "Fulton St & Van Siclen Ave",
 "short": "4111.04"
 },
 "2250948241329614952": {
-"cap": 0,
+"cap": 12,
 "lat": 40.6787,
 "lon": -73.88899,
 "name": "Barbey St & Fulton St",
 "short": "4185.02"
 },
 "2250948490437718122": {
-"cap": 0,
+"cap": 16,
 "lat": 40.67956,
 "lon": -73.88558,
 "name": "Cleveland St & Fulton St",
