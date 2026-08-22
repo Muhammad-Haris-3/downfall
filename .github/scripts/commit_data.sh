@@ -65,7 +65,24 @@ for attempt in 1 2 3; do
     exit 0
   fi
   echo "push attempt $attempt refused; rebasing onto $BRANCH"
-  git pull --rebase --autostash origin "$BRANCH" || true
+
+  # `|| true` used to be here, and it is what put conflict markers into the log.
+  # A rebase that conflicts stops half-done and leaves the markers in the
+  # working tree; swallowing the failure meant the next checkpoint's
+  # `git add data/` staged them and committed fifteen lines that made 42,000
+  # events unreadable (FINDINGS M1-T8c).
+  #
+  # .gitattributes now merges the log with `merge=union`, so an append-vs-append
+  # conflict resolves itself. This is the belt to that braces: if a rebase still
+  # fails for any reason, the tree is put back exactly as it was and the
+  # checkpoint is skipped. The data is on disk either way and the next
+  # checkpoint carries it.
+  if ! git pull --rebase --autostash origin "$BRANCH"; then
+    echo "rebase failed - aborting it and leaving the tree clean"
+    git rebase --abort || true
+    git stash pop 2>/dev/null || true
+    exit 0
+  fi
   sleep 5
 done
 

@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {"ev":"open","st":"0ebdda6a-37e4-4ff4-94e8-3947f49d8e24","k":"empty","ts":1787356690,"run":"9b029cf2502b"}
 {"ev":"open","st":"1882735457106787122","k":"full","ts":1787356745,"run":"9b029cf2502b"}
 {"ev":"open","st":"2687f2e1-3529-464d-82eb-e4f61440c563","k":"full","ts":1787356747,"run":"9b029cf2502b"}
@@ -1595,7 +1594,6 @@
 {"ev":"close","st":"66dd18dd-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787360019,"run":"9b029cf2502b"}
 {"ev":"close","st":"72796825-88b1-43a0-bb6d-2b41d337b1fc","k":"full","ts":1787360019,"run":"9b029cf2502b"}
 {"ev":"close","st":"66dcf922-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787360019,"run":"9b029cf2502b"}
-=======
 {"ev":"open","st":"c4e9905f-457b-4be0-a878-2aa53fa0b09b","k":"full","ts":1787359962,"run":"25b118b0287c","o":1}
 {"ev":"open","st":"6fd61eee-d0ef-4580-9704-bd06b82bcb61","k":"empty","ts":1787359978,"run":"25b118b0287c","o":1}
 {"ev":"open","st":"1814548067447122618","k":"full","ts":1787359975,"run":"25b118b0287c","o":1}
@@ -2602,7 +2600,6 @@
 {"ev":"close","st":"db91c9e0-d80b-4cb4-9cc2-9453ec8fbeac","k":"empty","ts":1787361819,"run":"25b118b0287c"}
 {"ev":"close","st":"66dd1846-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787361819,"run":"25b118b0287c"}
 {"ev":"close","st":"66dbf442-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787361819,"run":"25b118b0287c"}
->>>>>>> 267cd8b (Checkpoint: 20379 events, 10272 open / 10107 closed, 335 still out)
 {"ev":"open","st":"2227531312359792274","k":"full","ts":1787361858,"run":"25b118b0287c"}
 {"ev":"open","st":"0096fecb-3a56-4585-9204-aa9554f7bc49","k":"full","ts":1787361855,"run":"25b118b0287c"}
 {"ev":"open","st":"dba67615-a7e0-4c44-ab1b-b464033ec9b9","k":"full","ts":1787361829,"run":"25b118b0287c"}
@@ -6594,7 +6591,6 @@
 {"ev":"close","st":"6dec8948-44c7-4085-9682-446a891feb42","k":"full","ts":1787378078,"run":"25b118b0287c"}
 {"ev":"close","st":"66dce660-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787378078,"run":"25b118b0287c"}
 {"ev":"close","st":"66dc2c78-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787378078,"run":"25b118b0287c"}
-<<<<<<< HEAD
 {"ev":"open","st":"cb05443c-e68e-48f7-8d17-35353fa19d4d","k":"empty","ts":1787378083,"run":"25b118b0287c"}
 {"ev":"open","st":"66dbf442-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787378076,"run":"25b118b0287c"}
 {"ev":"open","st":"8ae0bf30-9979-461e-a947-2dd89f293b40","k":"full","ts":1787378115,"run":"25b118b0287c"}
@@ -6905,7 +6901,6 @@
 {"ev":"open","st":"3575749f-123a-4a80-870d-7ca7c7f9c8a9","k":"full","ts":1787380976,"run":"25b118b0287c"}
 {"ev":"close","st":"23539f3b-fb83-4f34-b8b8-9f1f37b5e646","k":"full","ts":1787381018,"run":"25b118b0287c"}
 {"ev":"close","st":"66db5f40-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787381018,"run":"25b118b0287c"}
-=======
 {"ev":"open","st":"18eccc71-66be-4e4c-8335-095a9bf0df94","k":"full","ts":1787381051,"run":"244af30d48bc","o":1}
 {"ev":"open","st":"1831178352265562334","k":"full","ts":1787381060,"run":"244af30d48bc","o":1}
 {"ev":"open","st":"1975518133370609774","k":"empty","ts":1787381073,"run":"244af30d48bc","o":1}
@@ -7212,7 +7207,6 @@
 {"ev":"close","st":"66dcecfa-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787382878,"run":"244af30d48bc"}
 {"ev":"close","st":"66dccd65-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787382878,"run":"244af30d48bc"}
 {"ev":"close","st":"d5d589e6-457f-4cd4-bf78-59165dce28b2","k":"full","ts":1787382878,"run":"244af30d48bc"}
->>>>>>> b7c8c21 (Checkpoint: 27073 events, 13643 open / 13430 closed, 380 still out)
 {"ev":"open","st":"bacfe3c2-7946-45ed-91f9-f5b91791de75","k":"full","ts":1787382922,"run":"244af30d48bc"}
 {"ev":"close","st":"66ddeffd-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787382938,"run":"244af30d48bc"}
 {"ev":"close","st":"9d95a4a9-bcfe-4189-bb7d-abd9992ecbaf","k":"full","ts":1787382938,"run":"244af30d48bc"}
@@ -8374,7 +8368,6 @@
 {"ev":"close","st":"1814548067447122618","k":"full","ts":1787399140,"run":"244af30d48bc"}
 {"ev":"close","st":"66dc4fb5-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787399140,"run":"244af30d48bc"}
 {"ev":"close","st":"0e5be726-2452-42a0-9be8-ea85c8408e4c","k":"full","ts":1787399140,"run":"244af30d48bc"}
-<<<<<<< HEAD
 {"ev":"open","st":"66ddbd20-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787399158,"run":"244af30d48bc"}
 {"ev":"open","st":"1786687245202023014","k":"full","ts":1787399160,"run":"244af30d48bc"}
 {"ev":"open","st":"0e003543-3656-448f-8a93-029d265f2e26","k":"full","ts":1787399133,"run":"244af30d48bc"}
@@ -8735,7 +8728,6 @@
 {"ev":"close","st":"1945126147213275898","k":"full","ts":1787402079,"run":"244af30d48bc"}
 {"ev":"close","st":"94771406-6712-4508-9392-11e9d90e1185","k":"full","ts":1787402079,"run":"244af30d48bc"}
 {"ev":"close","st":"66de186f-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787402079,"run":"244af30d48bc"}
-=======
 {"ev":"open","st":"66de25bd-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787402032,"run":"174172de2135","o":1}
 {"ev":"open","st":"18eccc71-66be-4e4c-8335-095a9bf0df94","k":"full","ts":1787402030,"run":"174172de2135","o":1}
 {"ev":"open","st":"943a1a27-1328-4823-8945-28d845280383","k":"full","ts":1787402042,"run":"174172de2135","o":1}
@@ -9109,7 +9101,6 @@
 {"ev":"close","st":"f833d403-2cf5-424a-a3b3-0314a44b4a67","k":"full","ts":1787403879,"run":"174172de2135"}
 {"ev":"close","st":"66dd217d-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787403879,"run":"174172de2135"}
 {"ev":"close","st":"72796825-88b1-43a0-bb6d-2b41d337b1fc","k":"full","ts":1787403879,"run":"174172de2135"}
->>>>>>> 15800a9 (Checkpoint: 28920 events, 14482 open / 14438 closed, 220 still out)
 {"ev":"open","st":"412c1416-d15b-4e6a-9691-da4c3cc0d0d2","k":"full","ts":1787403915,"run":"174172de2135"}
 {"ev":"close","st":"1848241879913802606","k":"full","ts":1787403938,"run":"174172de2135"}
 {"ev":"close","st":"2171902875345687974","k":"full","ts":1787403938,"run":"174172de2135"}
@@ -14219,7 +14210,6 @@
 {"ev":"close","st":"66db2afe-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787420138,"run":"174172de2135"}
 {"ev":"close","st":"9505c2b7-0c3a-4791-8471-d2092a86291f","k":"full","ts":1787420138,"run":"174172de2135"}
 {"ev":"close","st":"66ddbd20-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787420138,"run":"174172de2135"}
-<<<<<<< HEAD
 {"ev":"open","st":"ed279ef2-52ee-4ff2-9a52-edd8137ea034","k":"empty","ts":1787420135,"run":"174172de2135"}
 {"ev":"open","st":"66dc3782-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787420138,"run":"174172de2135"}
 {"ev":"open","st":"1814548067447122618","k":"full","ts":1787420146,"run":"174172de2135"}
@@ -15609,7 +15599,6 @@
 {"ev":"close","st":"66dea4bf-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787423079,"run":"174172de2135"}
 {"ev":"close","st":"d5cabb43-6c78-4022-964e-a8b02470509e","k":"full","ts":1787423079,"run":"174172de2135"}
 {"ev":"close","st":"66db6889-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787423079,"run":"174172de2135"}
-=======
 {"ev":"open","st":"023cf549-bd85-4f9a-abd8-70ba29d7e86b","k":"empty","ts":1787423097,"run":"eb31dca81ddb","o":1}
 {"ev":"open","st":"823ef531-40e6-4397-b973-86bf5b032076","k":"empty","ts":1787423079,"run":"eb31dca81ddb","o":1}
 {"ev":"open","st":"1d32e684-602b-46b6-8c96-ab47b57a03f3","k":"empty","ts":1787423103,"run":"eb31dca81ddb","o":1}
@@ -16576,7 +16565,6 @@
 {"ev":"close","st":"26176e86-8362-4c91-a693-6aa3f9ce0b73","k":"full","ts":1787424879,"run":"eb31dca81ddb"}
 {"ev":"close","st":"66dda55f-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787424879,"run":"eb31dca81ddb"}
 {"ev":"close","st":"36b55a0f-e55d-4849-859a-09b3273fb782","k":"full","ts":1787424879,"run":"eb31dca81ddb"}
->>>>>>> 4a40d3e (Checkpoint: 35358 events, 17717 open / 17641 closed, 281 still out)
 {"ev":"open","st":"66dd1f44-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787425035,"run":"eb31dca81ddb"}
 {"ev":"open","st":"1d32e684-602b-46b6-8c96-ab47b57a03f3","k":"empty","ts":1787425045,"run":"eb31dca81ddb"}
 {"ev":"open","st":"0e5be726-2452-42a0-9be8-ea85c8408e4c","k":"empty","ts":1787425006,"run":"eb31dca81ddb"}

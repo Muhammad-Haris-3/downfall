@@ -55,13 +55,37 @@ SEED = 20260821
 
 
 def floor_status():
-    """Progress toward PREREGISTRATION.md §3. Returns (met, rows)."""
-    outages = load_outages()
-    covered, span, runs = coverage()
-    cov_by_hour = coverage_by_hour(runs)
+    """Progress toward PREREGISTRATION.md §3. Returns (met, rows).
 
-    days = span / 86400 if span else 0.0
-    frac = covered / span if span else 0.0
+    COVERAGE IS MEASURED INSIDE THE WINDOW, NOT OVER ALL HISTORY.
+    §3 says "21 continuous days" and "coverage **within that window**". The first
+    implementation measured coverage over the whole span since the first run,
+    which is a different and stricter rule - it charges the steady state for
+    every hour lost while the collector was still being debugged. On 2026-08-22
+    that read 81.5% against a steady state of ~99.7%, because a 5.5-hour gap on
+    the first day was still in the denominator.
+
+    The window is the TRAILING 21 days. Fixed, and deliberately not "the best
+    21-day window available": searching for a window that passes is exactly the
+    move the floor exists to prevent.
+    """
+    outages = load_outages()
+    covered_all, span_all, runs = coverage()
+
+    now = max((r["end"] for r in runs), default=0)
+    window_start = now - REQUIRED_DAYS * 86400
+    in_window = [r for r in runs if r["end"] > window_start]
+
+    # Clip each run to the window so a run that straddles the boundary counts
+    # only the part inside it.
+    covered = sum(min(r["end"], now) - max(r["start"], window_start)
+                  for r in in_window)
+    span = now - max(window_start, min((r["start"] for r in runs), default=now))
+
+    cov_by_hour = coverage_by_hour(in_window)
+
+    days = span_all / 86400 if span_all else 0.0
+    frac = covered / span if span > 0 else 0.0
     complete = sum(1 for o in outages if o.usable_duration is not None)
 
     # Every hour-of-week slot needs REQUIRED_SLOT_OBSERVATIONS days on which it
@@ -74,15 +98,25 @@ def floor_status():
             slots[dt.weekday() * 24 + dt.hour].add(dt.date())
     thin = sum(1 for s in range(168) if len(slots.get(s, ())) < REQUIRED_SLOT_OBSERVATIONS)
 
+    # Diagnostic, not a gate. Early coverage is dragged down by hours lost while
+    # the collector was still being built, and the whole-history figure cannot
+    # distinguish "still broken" from "was broken once". This can.
+    day_start = now - 86400
+    recent_runs = [r for r in runs if r["end"] > day_start]
+    recent_cov = sum(min(r["end"], now) - max(r["start"], day_start)
+                     for r in recent_runs)
+    recent_span = now - max(day_start, min((r["start"] for r in runs), default=now))
+    recent = recent_cov / recent_span if recent_span > 0 else 0.0
+
     rows = [
         ("continuous days", days, REQUIRED_DAYS, "{:.1f}"),
-        ("coverage", frac, REQUIRED_COVERAGE, "{:.1%}"),
+        ("coverage, whole window", frac, REQUIRED_COVERAGE, "{:.1%}"),
         ("completed outages", complete, REQUIRED_OUTAGES, "{:,.0f}"),
         ("hour-of-week slots still thin", thin, 0, "{:.0f}"),
     ]
     met = (days >= REQUIRED_DAYS and frac >= REQUIRED_COVERAGE
            and complete >= REQUIRED_OUTAGES and thin == 0)
-    return met, rows, outages, runs
+    return met, rows, outages, runs, recent
 
 
 def band_for(value):
@@ -125,7 +159,7 @@ def compute_exposure(outages, runs, cohort_shorts):
 
 
 def main():
-    met, rows, outages, runs = floor_status()
+    met, rows, outages, runs, recent = floor_status()
 
     print("PREREGISTRATION.md §3 floor")
     for name, have, need, fmt in rows:
@@ -133,6 +167,9 @@ def main():
                        else have <= need) else ""
         print("  {:<32}{:>12}   need {:<10} {}".format(
             name, fmt.format(have), fmt.format(need), ok))
+    # Printed under the table, and labelled, so it can never be read as the gate.
+    print("  {:<32}{:>12}   diagnostic only".format(
+        "coverage, last 24h", "{:.1%}".format(recent)))
 
     if not met and "--force" not in sys.argv:
         print("\nFloor not met. No exposure figure is reported.")

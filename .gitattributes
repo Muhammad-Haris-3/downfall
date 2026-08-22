@@ -1,0 +1,20 @@
+# The event log is append-only, so a concurrent write is always two different
+# sets of lines added at the end of the same file. Git does not know that: it
+# sees two additions at the same position and calls it a conflict.
+#
+# It did, and the conflict markers were committed into the log - 15 lines of
+# `<<<<<<< HEAD` and friends, which made the whole file unparseable. See
+# FINDINGS M1-T8c.
+#
+# `merge=union` keeps both sides' lines and writes no markers, which is exactly
+# the right semantics for a log nobody ever edits in place. Order between the
+# two blocks is not guaranteed, so `analysis/events.py` sorts by timestamp
+# before pairing rather than trusting file order.
+data/events/*.ndjson merge=union
+
+# Line endings: the collector runs on Linux in CI and the analysis runs on
+# Windows locally. Without this, every checkpoint rewrites every line ending and
+# the diffs become unreadable.
+*.ndjson text eol=lf
+*.py text eol=lf
+*.sh text eol=lf

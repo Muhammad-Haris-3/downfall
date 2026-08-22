@@ -39,13 +39,37 @@ class Outage:
         return self.duration if (self.start_seen and self.end_seen) else None
 
 
+CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
+
+
 def iter_events(paths=None):
+    """Every event in the log, oldest first.
+
+    Sorted by timestamp rather than read in file order. The log is merged with
+    `merge=union` (see .gitattributes) so that concurrent appends never produce
+    conflict markers - but union merge gives no guarantee about the order of the
+    two blocks it keeps, and pairing an `open` with its `close` depends on
+    reading them in that order. Sorting costs one pass and removes the
+    dependency entirely.
+
+    A conflict marker raises rather than being skipped. They were committed into
+    the log once (FINDINGS M1-T8c) and silently ignoring them would mean an
+    analysis running happily over a file that is known to be damaged.
+    """
+    rows = []
     for p in sorted(paths or EVENTS.glob("*.ndjson")):
         with p.open(encoding="utf-8") as fh:
-            for line in fh:
+            for n, line in enumerate(fh, 1):
                 line = line.strip()
-                if line:
-                    yield json.loads(line)
+                if not line:
+                    continue
+                if line.startswith(CONFLICT_MARKERS):
+                    raise ValueError(
+                        "conflict marker at {}:{} - the log is damaged and must "
+                        "be repaired, not read".format(p.name, n))
+                rows.append(json.loads(line))
+    rows.sort(key=lambda e: e["ts"])
+    return rows
 
 
 def load_outages(paths=None, stats=None):

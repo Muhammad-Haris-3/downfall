@@ -71,6 +71,30 @@ def tally():
     return events, opens, closes, still_open
 
 
+CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
+
+
+def has_conflict_markers():
+    """Any line git left behind after a failed merge.
+
+    A rebase that hits a conflict leaves the markers in the working tree. The
+    commit script used to swallow that failure with `|| true`, and the next
+    checkpoint's `git add data/` staged the markers and committed them - fifteen
+    lines that made 42,000 events unreadable (FINDINGS M1-T8c).
+
+    Checked before anything is staged, because once committed the damage is in
+    the permanent record of a log that is supposed to be append-only.
+    """
+    found = []
+    for p in sorted(EVENTS.glob("*.ndjson")):
+        with p.open(encoding="utf-8", errors="replace") as fh:
+            for n, line in enumerate(fh, 1):
+                if line.strip().startswith(CONFLICT_MARKERS):
+                    found.append("{}:{}".format(p.name, n))
+                    break
+    return found
+
+
 def agrees_with_collector(events_on_disk):
     """Does the log hold what the running collector says it wrote?
 
@@ -100,6 +124,12 @@ def agrees_with_collector(events_on_disk):
 
 
 def main():
+    conflicts = has_conflict_markers()
+    if conflicts:
+        print("CONFLICT MARKERS in {} - refusing to commit a damaged log"
+              .format(", ".join(conflicts)), file=sys.stderr)
+        return 2
+
     whole, torn = files_are_whole()
     if not whole:
         print("torn line in {} - skipping this checkpoint".format(", ".join(torn)),

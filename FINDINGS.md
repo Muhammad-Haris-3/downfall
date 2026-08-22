@@ -840,3 +840,103 @@ be able to hold constant. And the rain result is a clean, checkable instance of
 the failure the project is about — a measure that is obvious, easy, and biased
 in a direction nobody guessed correctly.
 
+
+---
+
+## M1-T8c — Git conflict markers were committed into an append-only log
+
+**Method.** `analysis/exposure.py` failed to parse the event log. Every line was
+scanned rather than the first failure being patched.
+
+```
+2026-08-21.ndjson    3 marker lines
+2026-08-22.ndjson   12 marker lines
+      <<<<<<< HEAD
+      =======
+      >>>>>>> 570af2e (Checkpoint: 9744 events, 4950 open / 4794 closed, ...)
+```
+
+**Fifteen lines made 42,069 events unreadable.**
+
+### Why it happened
+
+The event log is append-only, so two writers produce two different sets of lines
+added at the end of the same file. `commit_data.sh` rebased on a rejected push,
+and its comment asserted that such a case "replays cleanly".
+
+**It does not.** Git has no idea the file is append-only. It sees two additions
+at the same position and calls it a conflict — correctly, by its own rules.
+
+The rebase then stopped half-done with markers in the working tree, `|| true`
+swallowed the failure, and the next checkpoint's `git add data/` staged and
+committed them.
+
+Three separate mistakes, each individually small:
+
+- **A claim about git's behaviour that was asserted rather than tested.** The
+  comment explaining why rebasing was safe was itself the error.
+- **`|| true` on a command whose failure mattered.** It was there to stop a
+  transient network failure from killing the job, and it also silenced the one
+  failure that must never be ignored.
+- **No check that what was about to be committed was parseable.** The checkpoint
+  verified that files ended on a line boundary — a much rarer corruption than
+  the one that actually occurred.
+
+### What it cost
+
+**Nothing, as it turned out.** 42,069 events, all distinct, zero duplicates: the
+conflict interleaved the two sides rather than duplicating either. Both writers'
+events survived in full and only git's own annotations had to be removed.
+
+That is luck, not design. A conflict resolved the other way would have silently
+dropped one side.
+
+### The fix, in four parts
+
+1. **`.gitattributes` sets `merge=union` on the event log.** Both sides' lines
+   are kept and no markers are written — which is the correct semantics for a
+   file nobody ever edits in place, and what the original comment wrongly
+   assumed git already did.
+2. **`iter_events` sorts by timestamp.** Union merge gives no guarantee about the
+   order of the blocks it keeps, and pairing an `open` with its `close` depended
+   on file order. One pass removes the dependency.
+3. **A conflict marker now raises rather than being skipped**, in both the reader
+   and the checkpoint. An analysis running happily over a file known to be
+   damaged is worse than one that stops.
+4. **The rebase no longer fails silently.** On conflict the tree is restored and
+   the checkpoint is skipped; the data is on disk and the next one carries it.
+
+### Coverage was being measured against the wrong denominator
+
+Found while verifying the repair. `PREREGISTRATION.md` §3 requires 21 continuous
+days at ≥95% coverage **within that window**. The implementation measured
+coverage over the entire span since the first run.
+
+| | |
+|---|---|
+| Whole span since first run | **81.5%** |
+| **Last 24 hours** | **99.9%** |
+
+The gap is one 334-minute hole on 2026-08-21, while the data-loss bug of M1-T8b
+was being diagnosed and the collector was stopped. Handovers since have been
+**0–1 minute**.
+
+Corrected to a trailing 21-day window, which is what §3 says. That is
+implementing the written rule, not relaxing it — and the window is fixed as
+*trailing*, deliberately not "the best available 21 days", because searching for
+a window that passes is the precise move the floor exists to prevent.
+
+The steady-state figure is reported underneath the table, labelled **diagnostic
+only**, because a second coverage number next to a gate is an invitation to
+quote whichever one is more flattering.
+
+### An open item, recorded and not yet explained
+
+**806 outages carry a `lost_close` flag** — 3.8% of 21,086. Each is a station
+seen to open twice with no close between, which means a close never reached the
+log. They are excluded from every duration figure, so nothing is overstated.
+
+The likely cause is a run checking out the repository before its predecessor's
+final commit landed, and so starting from a stale state file. **Not established**,
+and it needs to be before the coverage floor is reached.
+

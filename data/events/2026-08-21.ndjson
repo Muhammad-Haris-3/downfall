@@ -8264,7 +8264,6 @@
 {"ev":"close","st":"2254550579741656756","k":"full","ts":1787334219,"run":"cbb6005b1d7b"}
 {"ev":"close","st":"66db64d1-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787334219,"run":"cbb6005b1d7b"}
 {"ev":"close","st":"1841240663447542046","k":"full","ts":1787334219,"run":"cbb6005b1d7b"}
-<<<<<<< HEAD
 {"ev":"open","st":"24509e46-a0de-47e8-ba40-9441da68952a","k":"empty","ts":1787334267,"run":"cbb6005b1d7b"}
 {"ev":"open","st":"3db799ba-b574-4e5f-95e5-c767bec2acb6","k":"full","ts":1787334277,"run":"cbb6005b1d7b"}
 {"ev":"open","st":"2c8b263e-952c-4941-a671-ef0ebb062632","k":"full","ts":1787334287,"run":"cbb6005b1d7b"}
@@ -10372,7 +10371,6 @@
 {"ev":"close","st":"3f878b81-324e-4673-9221-43d34647e76f","k":"full","ts":1787338960,"run":"cbb6005b1d7b"}
 {"ev":"close","st":"66dd243c-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1787338960,"run":"cbb6005b1d7b"}
 {"ev":"close","st":"66dc1545-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787338960,"run":"cbb6005b1d7b"}
-=======
 {"ev":"open","st":"bcb08532-f0d5-4c0e-ad8a-4ddacc204791","k":"empty","ts":1787338959,"run":"9b029cf2502b","o":1}
 {"ev":"open","st":"ca843847-923a-40b7-80ca-c1c3fff6e818","k":"empty","ts":1787338967,"run":"9b029cf2502b","o":1}
 {"ev":"open","st":"81a98b0b-cfd6-48b4-90bd-806ebbc264a0","k":"empty","ts":1787338969,"run":"9b029cf2502b","o":1}
@@ -11543,7 +11541,6 @@
 {"ev":"close","st":"493e046c-5d62-4772-90c4-b6a9f4afcd39","k":"empty","ts":1787340819,"run":"9b029cf2502b"}
 {"ev":"close","st":"4168e5a4-c7ec-4045-bfc8-84ac5edbe845","k":"full","ts":1787340819,"run":"9b029cf2502b"}
 {"ev":"close","st":"66ddede1-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1787340819,"run":"9b029cf2502b"}
->>>>>>> 570af2e (Checkpoint: 9744 events, 4950 open / 4794 closed, 337 still out)
 {"ev":"open","st":"74723006-b32f-4590-8cc7-f15eec3808fe","k":"empty","ts":1787340898,"run":"9b029cf2502b"}
 {"ev":"open","st":"3db799ba-b574-4e5f-95e5-c767bec2acb6","k":"full","ts":1787340912,"run":"9b029cf2502b"}
 {"ev":"open","st":"162d5859-b735-4ff7-9613-01b21f22c1cd","k":"full","ts":1787340911,"run":"9b029cf2502b"}
