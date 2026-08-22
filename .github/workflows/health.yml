@@ -1,0 +1,44 @@
+name: health
+
+# Look at the record every few hours, and fail loudly when it is damaged.
+#
+# Two failures ran unnoticed for hours each: the collector writing five hours of
+# events into an unlinked file while reporting success at every checkpoint
+# (FINDINGS M1-T8b), and fifteen git conflict markers making 42,000 events
+# unparseable while the collector went on committing on top of them (M1-T8c).
+#
+# Neither was subtle once looked at. Nothing was looking. This is the something
+# that looks.
+#
+# Deliberately separate from `collect`: a check that runs inside the job it is
+# checking shares that job's failure modes, and the second bug was invisible
+# precisely because everything reporting on it was part of the thing that broke.
+
+on:
+  schedule:
+    - cron: "13 */4 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - "collector/health.py"
+      - "analysis/events.py"
+      - ".github/workflows/health.yml"
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: check the record
+        run: python collector/health.py
+
+      - name: floor progress
+        # Never gates anything - exposure.py exits non-zero until the floor is
+        # met, which is its whole job, so its status is explicitly ignored here.
+        if: always()
+        run: python analysis/exposure.py || true

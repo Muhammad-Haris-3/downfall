@@ -43,14 +43,23 @@ CONFLICT_MARKERS = ("<<<<<<<", "=======", ">>>>>>>")
 
 
 def iter_events(paths=None):
-    """Every event in the log, oldest first.
+    """Every event in the log, in the order it was written.
 
-    Sorted by timestamp rather than read in file order. The log is merged with
-    `merge=union` (see .gitattributes) so that concurrent appends never produce
-    conflict markers - but union merge gives no guarantee about the order of the
-    two blocks it keeps, and pairing an `open` with its `close` depends on
-    reading them in that order. Sorting costs one pass and removes the
-    dependency entirely.
+    NOT sorted by timestamp, and that was tried and reverted.
+
+    An `open` carries the station's own `last_reported`; a `close` carries the
+    newest `last_reported` anywhere in the network, because the recovering
+    station is no longer in the outage set when the close is written. Those are
+    two different clocks. A station whose own clock lags the network then
+    produces an open whose timestamp precedes the close that came before it -
+    202 events in the log do exactly this - and sorting by timestamp reorders
+    them into an impossible sequence. Measured: file order gives 620 apparent
+    lost closes, timestamp order gives 806. The 186 difference was manufactured
+    by the sort.
+
+    File order is correct because each run appends contiguously and runs do not
+    overlap. `merge=union` (see .gitattributes) preserves each side's block, so
+    a merged file is still a concatenation of ordered runs.
 
     A conflict marker raises rather than being skipped. They were committed into
     the log once (FINDINGS M1-T8c) and silently ignoring them would mean an
@@ -68,7 +77,6 @@ def iter_events(paths=None):
                         "conflict marker at {}:{} - the log is damaged and must "
                         "be repaired, not read".format(p.name, n))
                 rows.append(json.loads(line))
-    rows.sort(key=lambda e: e["ts"])
     return rows
 
 
@@ -123,13 +131,43 @@ def load_outages(paths=None, stats=None):
     return out
 
 
+HEARTBEAT = ROOT / "data" / "state" / "collector.json"
+
+
 def coverage():
-    """(covered_seconds, span_seconds, runs) from the per-run record."""
+    """(covered_seconds, span_seconds, runs) including the run happening now.
+
+    A run writes its coverage row when it ends, and only then - counting it
+    twice was the reason for that rule. But a run lasts up to 350 minutes, so
+    for most of any given moment the newest run has recorded nothing, and
+    coverage computed from completed rows alone understates by up to one run
+    length. Measured on 2026-08-22: 81.9% against a true 99.9%, because the
+    four hours then in progress were invisible.
+
+    The heartbeat says which run is live and when it last wrote. If that run has
+    no row yet, it is credited from its start to its last heartbeat - never
+    beyond, so an abandoned run stops accruing coverage the moment it stops
+    writing.
+    """
     if not RUNS.exists():
         return 0, 0, []
-    runs = [json.loads(l) for l in RUNS.read_text(encoding="utf-8").splitlines() if l.strip()]
+    runs = [json.loads(l) for l in RUNS.read_text(encoding="utf-8").splitlines()
+            if l.strip()]
     if not runs:
         return 0, 0, []
-    covered = sum(r["end"] - r["start"] for r in runs)
-    span = max(r["end"] for r in runs) - min(r["start"] for r in runs)
-    return covered, span, runs
+
+    recorded = {r["run"] for r in runs}
+    live = None
+    if HEARTBEAT.exists():
+        try:
+            hb = json.loads(HEARTBEAT.read_text())
+            if hb.get("run") not in recorded and hb.get("started") and hb.get("at"):
+                live = {"run": hb["run"], "start": hb["started"], "end": hb["at"],
+                        "in_progress": True}
+        except (OSError, ValueError):
+            live = None
+
+    all_runs = runs + ([live] if live else [])
+    covered = sum(r["end"] - r["start"] for r in all_runs)
+    span = max(r["end"] for r in all_runs) - min(r["start"] for r in all_runs)
+    return covered, span, all_runs

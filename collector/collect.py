@@ -82,11 +82,66 @@ def classify(s):
 
 # ------------------------------------------------------------- durable state
 
+def state_from_log():
+    """Rebuild the set of open outages by replaying the event log.
+
+    The log is the record; `open.json` is a cache of it. They are written at
+    different moments, and the cache is the one that goes stale: a new job
+    checks the repository out while its predecessor is still finishing, so it
+    can start from a state file up to a checkpoint old. Every outage that opened
+    in that window is missing from it, the new run writes a second `open`, and
+    the pair reads afterwards as a lost close - 620 of them, 2.9% of all
+    outages, before this existed.
+
+    Replaying 42,000 events costs well under a second, and the log cannot
+    disagree with itself.
+    """
+    open_now = {}
+    for p in sorted(EVENTS.glob("*.ndjson")):
+        try:
+            with p.open(encoding="utf-8") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line or line.startswith(("<<<<<<<", "=======", ">>>>>>>")):
+                        continue
+                    ev = json.loads(line)
+                    key = (ev["st"], ev["k"])
+                    if ev["ev"] == "open":
+                        open_now[key] = {"since": ev["ts"], "run": ev.get("run"),
+                                         "o": ev.get("o", 0)}
+                    else:
+                        open_now.pop(key, None)
+        except (OSError, ValueError):
+            # A damaged log is not a reason to start blind; fall back to the
+            # cache, which at worst is stale rather than unreadable.
+            return None
+    return open_now
+
+
 def load_state():
+    """Open outages carried over from the previous run.
+
+    The log wins when the two disagree, because the cache is the thing that goes
+    stale. The cache is still read, and a disagreement is reported rather than
+    silently resolved - it is the signal that a handover dropped something.
+    """
+    cached = {}
     if STATE.exists():
         raw = json.loads(STATE.read_text())
-        return {tuple(k.split("|", 1)): v for k, v in raw.items()}
-    return {}
+        cached = {tuple(k.split("|", 1)): v for k, v in raw.items()}
+
+    replayed = state_from_log()
+    if replayed is None:
+        return cached
+
+    only_log = set(replayed) - set(cached)
+    only_cache = set(cached) - set(replayed)
+    if only_log or only_cache:
+        print("  state: {} open per log, {} per cache "
+              "({} only in log, {} only in cache) - using the log".format(
+                  len(replayed), len(cached), len(only_log), len(only_cache)),
+              flush=True)
+    return replayed
 
 
 def count_events_on_disk():
@@ -98,18 +153,26 @@ def count_events_on_disk():
     return n
 
 
-def write_heartbeat(run_id, expected_total, written):
+def write_heartbeat(run_id, expected_total, written, started):
     """What the collector believes is on disk, for the checkpoint to check.
 
     The orphaned-handle bug (FINDINGS M1-T8b) was invisible precisely because
     nothing ever compared the collector's own count against the file it was
     supposedly writing. Recording the expectation is what turns a silent loss
     into a failed job.
+
+    `started` is here so that coverage can credit a run that is still going. A
+    run writes its coverage row only when it ends - counting it twice was the
+    reason for that rule - but a run lasts up to 350 minutes, so for most of any
+    moment the newest run has recorded nothing and coverage reads low by up to
+    one run length. `at` bounds the credit: an abandoned run stops accruing the
+    moment it stops writing.
     """
     HEARTBEAT.parent.mkdir(parents=True, exist_ok=True)
     tmp = HEARTBEAT.with_suffix(".tmp")
     tmp.write_text(json.dumps({"run": run_id, "expected_events_on_disk": expected_total,
-                               "written_this_run": written, "at": int(time.time())}))
+                               "written_this_run": written, "at": int(time.time()),
+                               "started": started}))
     tmp.replace(HEARTBEAT)
 
 
@@ -325,7 +388,7 @@ def main(minutes=0.0):
                     if o or c:
                         log.flush()
                         save_state(open_now)
-                        write_heartbeat(run_id, events_at_start + log.n, log.n)
+                        write_heartbeat(run_id, events_at_start + log.n, log.n, started)
                     first_file = False
                     if files % 15 == 0:
                         print("  {} files  open:{}  +{} -{}".format(
@@ -338,7 +401,7 @@ def main(minutes=0.0):
     log.flush()
     log.close()
     save_state(open_now)
-    write_heartbeat(run_id, events_at_start + log.n, log.n)
+    write_heartbeat(run_id, events_at_start + log.n, log.n, started)
 
     ended = int(time.time())
     RUNS.parent.mkdir(parents=True, exist_ok=True)

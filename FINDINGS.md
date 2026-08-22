@@ -940,3 +940,101 @@ The likely cause is a run checking out the repository before its predecessor's
 final commit landed, and so starting from a stale state file. **Not established**,
 and it needs to be before the coverage floor is reached.
 
+
+---
+
+## M1-T8d — The 806 lost closes were three separate problems, one of them new
+
+Followed up on the open item from M1-T8c. It was not one cause.
+
+### 1. Sorting by timestamp manufactured 186 of them
+
+| Order | Apparent lost closes |
+|---|---|
+| File order | **620** |
+| Sorted by timestamp | **806** |
+
+The sort was added hours earlier, in M1-T8c, to make pairing independent of the
+order `merge=union` leaves blocks in. It was wrong, because **opens and closes
+do not share a clock**.
+
+An `open` carries the station's own `last_reported`. A `close` carries the
+newest `last_reported` anywhere in the network — the recovering station has left
+the outage set by then, so its own value is not to hand. A station whose clock
+lags the network therefore produces an open whose timestamp *precedes* the close
+that came before it. **202 events in the log do exactly this**, and sorting
+reordered them into an impossible sequence.
+
+**Reverted to file order**, which is correct for a different reason: each run
+appends contiguously, runs do not overlap, and union merge preserves each side's
+block. A merged file is still a concatenation of ordered runs.
+
+The lesson is narrow and worth keeping: a sort key must be a total order over
+the thing being sorted. `ts` is not — it is two clocks wearing one field name.
+
+### 2. The remaining 620 are a stale state file at handover
+
+`open.json` is a cache of the log. A new job checks the repository out while its
+predecessor is still finishing, so it can begin from a state file up to one
+checkpoint — thirty minutes — old. Every outage that opened inside that window
+is missing from it, the new run writes a second `open`, and the pair reads
+afterwards as a lost close.
+
+620 of 21,086 outages, **2.9%**, across nine handovers — about 70 each, which is
+roughly what thirty minutes of openings looks like.
+
+Two changes: the job now pulls immediately before starting the collector, and
+**the collector rebuilds its open set by replaying the log rather than trusting
+the cache**. Replaying 42,000 events costs well under a second, and the log
+cannot disagree with itself. A disagreement between log and cache is now
+printed rather than silently resolved — it is the signal that a handover
+dropped something.
+
+### 3. Coverage was understating itself by up to one run length
+
+Found because two tools disagreed: `health.py` said 81.9% for the last 24 hours
+and `exposure.py` said 99.9%.
+
+Neither was wrong about what it measured. A run writes its coverage row **when
+it ends, and only then** — the rule that stops a checkpoint counting the same
+time twice. But a run lasts up to 350 minutes, so at most moments the newest run
+has recorded nothing at all, and coverage built from completed rows alone is
+blind to it.
+
+The heartbeat now carries the run's start, and `coverage()` credits a live run
+from its start to its **last heartbeat** — never to the present, so an abandoned
+run stops accruing the moment it stops writing.
+
+This is the same shape as M1-T8b and the map: **a number true about what was
+recorded and false about what happened.** The only reason it surfaced is that
+two independently-written tools were asked the same question and gave different
+answers.
+
+---
+
+## M1-T8e — Something now watches the record
+
+Two failures ran unnoticed for hours each. Neither was subtle once looked at;
+nothing was looking.
+
+`collector/health.py` runs every four hours in its own workflow and fails the
+job when the record is damaged or collection has stopped:
+
+| Check | Fails when |
+|---|---|
+| Log parses | a conflict marker or malformed line is present |
+| No torn lines | a file does not end on a line boundary |
+| Collection is live | nothing written for 2 hours |
+| Coverage, last 24h | below 90% — **warns**, does not fail |
+| Lost closes | above 5% — **warns**, does not fail |
+
+Failures and warnings are separated deliberately. A damaged record or a stopped
+collector is broken and must be seen. A number that is worse than it should be
+while the record stays sound is not, and **a check that cries wolf gets muted —
+after which the next real failure is invisible too.**
+
+It runs in its own workflow rather than inside `collect`, because a check that
+runs inside the job it is checking shares that job's failure modes. That is
+precisely why M1-T8b stayed hidden: everything reporting on the collector was
+part of the collector.
+

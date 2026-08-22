@@ -77,6 +77,13 @@ jobs:
           git config user.name  "downfall-collector"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+          # The predecessor is usually still committing when this job checks
+          # out, so the log on disk can be a checkpoint behind. Pulling here
+          # closes most of that window; what remains is handled by rebuilding
+          # open state from the log rather than trusting the cached state file.
+          git pull --rebase --autostash origin "${GITHUB_REF_NAME}" || \
+            echo "pull failed; continuing on the checked-out log"
+
           MINUTES="${{ github.event.inputs.minutes || '350' }}"
           python collector/collect.py "$MINUTES" &
           COLLECTOR=$!
