@@ -22,6 +22,11 @@ data/events/*
 !data/state/
 data/state/*
 !data/state/open.json
+# The heartbeat, which is how coverage credits a run that is still going and how
+# a run that died without writing its coverage row is recovered. It was left out
+# of this list when it was added, so the live-run coverage fix silently did
+# nothing in CI - the file never got there. See FINDINGS M1-T8f.
+!data/state/collector.json
 
 !data/runs.ndjson
 !data/stations.json

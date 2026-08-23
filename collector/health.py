@@ -95,7 +95,31 @@ def main():
     check(frac >= MIN_RECENT_COVERAGE,
           "coverage last 24h {:.1%}".format(frac), fatal=False)
 
-    # 5. Outages whose close never arrived. Excluded from every duration figure,
+    # 5. Every run that wrote events also recorded what it observed.
+    #
+    # A run records its coverage when it ends. One died without doing so and six
+    # hours of collection became invisible - the log had the events, the
+    # coverage record had nothing, and the only symptom was a coverage figure
+    # that looked bad for no stated reason. This names the cause directly.
+    from analysis.events import HEARTBEAT, iter_events  # noqa: E402
+
+    recorded = {r["run"] for r in runs}
+    live = None
+    if HEARTBEAT.exists():
+        try:
+            live = json.loads(HEARTBEAT.read_text()).get("run")
+        except (OSError, ValueError):
+            live = None
+    wrote_events = {e.get("run") for e in iter_events()} - {None, "reconcile-m1-t8b"}
+    orphans = wrote_events - recorded - {live}
+    check(not orphans,
+          "every run that wrote events recorded its coverage"
+          if not orphans else
+          "{} run(s) wrote events but no coverage row: {}".format(
+              len(orphans), ", ".join(sorted(orphans))),
+          fatal=False)
+
+    # 6. Outages whose close never arrived. Excluded from every duration figure,
     #    so a rise costs completeness rather than correctness - a warning.
     print("\nrecord quality")
     lost = stats.get("lost_closes", 0)

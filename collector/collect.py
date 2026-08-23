@@ -319,6 +319,51 @@ def step(payload, log, open_now, run_id, first_file, starts_uncertain=False):
 HANDOVER_S = 600      # a gap longer than this is not a handover, it is an outage
 
 
+def recover_abandoned_run():
+    """Write a coverage row for a previous run that died before writing its own.
+
+    A run records its coverage when it ends, and only then - the rule that stops
+    a checkpoint counting the same time twice. The cost is that a run killed
+    before it finishes records nothing at all, and every hour it collected
+    becomes invisible. One did: 2026-08-22 18:16 to 00:06, six hours of events in
+    the log and no coverage for any of it, which alone dropped the 24-hour figure
+    from 99.9% to 72.9%.
+
+    The heartbeat is what makes the recovery honest. It carries the run's start
+    and the moment it last wrote, so the recovered row spans exactly the period
+    the run demonstrably observed - never to the present, so a run that stopped
+    writing stops accruing coverage at the point it stopped.
+
+    Marked `recovered` so the row is never mistaken for one a run wrote itself.
+    """
+    if not HEARTBEAT.exists() or not RUNS.exists():
+        return None
+    try:
+        hb = json.loads(HEARTBEAT.read_text())
+    except (OSError, ValueError):
+        return None
+    if not hb.get("started") or not hb.get("at"):
+        return None
+
+    seen = set()
+    for line in RUNS.read_text(encoding="utf-8").splitlines():
+        if line.strip():
+            seen.add(json.loads(line)["run"])
+    if hb.get("run") in seen:
+        return None
+
+    row = {"run": hb["run"], "start": hb["started"], "end": hb["at"],
+           "files": None, "requests": None, "not_modified": None,
+           "errors": None, "suspected_skips": None,
+           "opened": None, "closed": None, "closed_in_gap": None,
+           "still_open": None, "events": hb.get("written_this_run"),
+           "recovered": 1,
+           "note": "run ended without writing its own row; bounded by its last heartbeat"}
+    with RUNS.open("a", encoding="utf-8") as fh:
+        fh.write(json.dumps(row, separators=(",", ":")) + "\n")
+    return row
+
+
 def previous_run_end():
     """When the last run stopped, or None if this is the first ever."""
     if not RUNS.exists():
@@ -331,6 +376,14 @@ def main(minutes=0.0):
     run_id = uuid.uuid4().hex[:12]
     started = int(time.time())
     log = EventLog()
+
+    # Before anything else: if the previous run died without recording what it
+    # observed, salvage that from its heartbeat. Done first so this run's own
+    # heartbeat does not overwrite the evidence.
+    salvaged = recover_abandoned_run()
+    if salvaged:
+        print("recovered coverage for abandoned run {}: {:.0f} min".format(
+            salvaged["run"], (salvaged["end"] - salvaged["start"]) / 60), flush=True)
 
     cold = not STATE.exists()
     open_now = load_state()
