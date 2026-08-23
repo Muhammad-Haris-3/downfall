@@ -1,27 +1,54 @@
+/* Modernist — flat, architectural, Archivo throughout.
+   A near-mono red on a light ground, a visible modular grid, zero corner radius
+   and strong 2px rules. Nothing floats and nothing is decorated: alignment and
+   the weight of the dividers do all the organising, and everything sits flush
+   left, including the labels inside buttons. */
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&display=swap');
+
 :root {
-  --bg: #0b0d10;
-  --panel: #12161b;
-  --line: #1e252d;
-  --ink: #e7ecf2;
-  --muted: #8b97a6;
-  --dim: #5c6775;
-  --accent: #4ea1ff;
-  --warn: #f0a848;
-  --bad: #e5544b;
-  --good: #3fb27f;
+  --bg: #f3f2f2;
+  --surface: #eae9e9;
+  --raise: #ffffff;
+  --ink: #201e1d;
+  --muted: #605d5d;
+  --dim: #7d7979;
+  --accent: #ec3013;
+  --accent-strong: #ae1800;
+  --accent-soft: #ffe0d9;
+  --divider: rgba(32, 30, 29, .40);
+  --line: rgba(32, 30, 29, .16);
+  --sh-sm: 0 1px 2px rgba(45, 43, 43, .14);
+  --sh-md: 0 3px 10px rgba(45, 43, 43, .16);
+  --sh-lg: 0 12px 32px rgba(45, 43, 43, .22);
+  --sh-hover: 0 18px 44px rgba(45, 43, 43, .20);
+  --mesh-a: rgba(236, 48, 19, .10);
+  --mesh-b: rgba(32, 30, 29, .07);
+  --grid: rgba(32, 30, 29, .055);
   --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --bg: #fbfcfd;
-    --panel: #ffffff;
-    --line: #e3e8ee;
-    --ink: #10151b;
-    --muted: #5a6675;
-    --dim: #8a95a3;
-    --accent: #1f6fd0;
-  }
+/* The toggle sets data-theme explicitly. `prefers-color-scheme` is deliberately
+   NOT consulted: the palette is the argument here, and a reader who has chosen
+   one should not have the other imposed by their operating system. */
+[data-theme="dark"] {
+  --bg: #151413;
+  --surface: #201e1d;
+  --raise: #2a2726;
+  --ink: #f3f2f2;
+  --muted: #bab6b6;
+  --dim: #9b9797;
+  --accent: #ff563c;
+  --accent-strong: #ff9783;
+  --accent-soft: rgba(255, 86, 60, .16);
+  --divider: rgba(243, 242, 242, .42);
+  --line: rgba(243, 242, 242, .16);
+  --sh-sm: 0 1px 2px rgba(0, 0, 0, .5);
+  --sh-md: 0 4px 14px rgba(0, 0, 0, .55);
+  --sh-lg: 0 16px 40px rgba(0, 0, 0, .65);
+  --sh-hover: 0 22px 52px rgba(0, 0, 0, .7);
+  --mesh-a: rgba(255, 86, 60, .14);
+  --mesh-b: rgba(255, 255, 255, .05);
+  --grid: rgba(243, 242, 242, .045);
 }
 
 * { box-sizing: border-box; }
@@ -31,72 +58,117 @@ html, body {
   padding: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: "Archivo", system-ui, sans-serif;
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  transition: background .55s cubic-bezier(.2, .7, .2, 1),
+              color .55s cubic-bezier(.2, .7, .2, 1);
 }
 
-a { color: var(--accent); text-decoration: none; }
-a:hover { text-decoration: underline; }
+a { color: var(--accent); text-decoration: none; transition: color .2s ease; }
+a:hover { color: var(--accent-strong); }
+::selection { background: var(--accent); color: #fff; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
-.wrap { max-width: 1140px; margin: 0 auto; padding: 0 24px; }
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes drift-a { 0% { transform: translate3d(-6%, -4%, 0) scale(1); } 50% { transform: translate3d(8%, 6%, 0) scale(1.18); } 100% { transform: translate3d(-6%, -4%, 0) scale(1); } }
+@keyframes drift-b { 0% { transform: translate3d(6%, 4%, 0) scale(1.1); } 50% { transform: translate3d(-7%, -6%, 0) scale(.94); } 100% { transform: translate3d(6%, 4%, 0) scale(1.1); } }
+@keyframes drift-c { 0% { transform: translate3d(0, 0, 0) scale(1); } 50% { transform: translate3d(-9%, 7%, 0) scale(1.22); } 100% { transform: translate3d(0, 0, 0) scale(1); } }
 
-header.site {
-  border-bottom: 1px solid var(--line);
-  padding: 18px 0;
-  position: sticky;
-  top: 0;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(8px);
-  z-index: 10;
+/* Motion is decoration here, so it goes away entirely when asked. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
 }
-header.site .wrap { display: flex; align-items: baseline; gap: 24px; }
-header.site .name { font-weight: 700; letter-spacing: -0.02em; font-size: 18px; }
-header.site nav { display: flex; gap: 18px; margin-left: auto; font-size: 14px; }
-header.site nav a { color: var(--muted); }
 
-.hero { padding: 64px 0 40px; }
-.hero h1 {
-  font-size: clamp(30px, 5vw, 46px);
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  margin: 0 0 20px;
-  max-width: 20ch;
+.wrap { max-width: 1280px; margin: 0 auto; padding: 0 32px; }
+.rule { height: 2px; background: var(--divider); }
+
+.kicker {
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
 }
-.hero p.lede { font-size: 19px; color: var(--muted); max-width: 62ch; margin: 0 0 14px; }
 
-.status {
-  display: inline-flex; align-items: center; gap: 8px;
-  border: 1px solid var(--line); border-radius: 999px;
-  padding: 5px 13px; font-size: 13px; color: var(--muted);
-  font-family: var(--mono);
+h1, h2, h3 { font-weight: 800; letter-spacing: -.035em; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(42px, 7.2vw, 92px); line-height: .94; letter-spacing: -.045em; }
+h2 { font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; }
+h3 { font-size: 19px; letter-spacing: -.02em; }
+p { text-wrap: pretty; }
+
+section { max-width: 1280px; margin: 0 auto; padding: 72px 32px; }
+
+/* Cards are surface-filled with a hard 2px edge — no radius, no float. */
+.card {
+  background: var(--raise);
+  border: 2px solid var(--line);
+  padding: 22px;
+  transition: transform .3s cubic-bezier(.2, .7, .2, 1), box-shadow .3s ease, border-color .25s ease;
 }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); }
+.card:hover { border-color: var(--accent); box-shadow: var(--sh-md); }
+.card .k { font-size: 11.5px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--dim); }
+.card .v { font-size: 40px; font-weight: 800; letter-spacing: -.04em; line-height: 1.05; margin: 8px 0 6px; font-variant-numeric: tabular-nums; }
+.card .d { font-size: 13.5px; color: var(--muted); line-height: 1.45; }
 
-section { padding: 40px 0; border-top: 1px solid var(--line); }
-h2 { font-size: 22px; letter-spacing: -0.02em; margin: 0 0 8px; }
-h2 + p.sub { color: var(--muted); margin: 0 0 24px; max-width: 68ch; }
+.btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: inherit; font-size: 14.5px; font-weight: 700; letter-spacing: .02em;
+  padding: 15px 22px; border: 0; cursor: pointer;
+  transition: transform .3s cubic-bezier(.2, .7, .2, 1), box-shadow .3s ease,
+              background .25s ease, border-color .25s ease, color .25s ease;
+}
+.btn-primary { background: var(--accent); color: #fff; box-shadow: var(--sh-sm); }
+.btn-primary:hover { transform: translateY(-3px); box-shadow: var(--sh-hover); background: var(--accent-strong); color: #fff; }
+.btn-ghost { background: transparent; color: var(--ink); border: 2px solid var(--line); }
+.btn-ghost:hover { transform: translateY(-3px); border-color: var(--accent); background: var(--accent-soft); color: var(--ink); }
 
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; }
-.card .k { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--dim); }
-.card .v { font-size: 26px; font-weight: 650; font-family: var(--mono); letter-spacing: -0.02em; margin-top: 4px; }
-.card .d { font-size: 13px; color: var(--muted); margin-top: 4px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th {
+  text-align: left; padding: 12px 14px;
+  font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--dim); border-bottom: 2px solid var(--divider);
+}
+td { padding: 14px; border-bottom: 1px solid var(--line); }
+tbody tr { transition: background .2s ease; }
+tbody tr:hover { background: var(--accent-soft); }
+.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); }
 
 .note {
-  border-left: 3px solid var(--warn);
-  background: color-mix(in srgb, var(--warn) 7%, transparent);
-  padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 22px 0;
-  font-size: 15px;
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 20px 24px;
+  font-size: 15.5px;
+  line-height: 1.6;
 }
-.note strong { color: var(--ink); }
-
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line); }
-th { color: var(--dim); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
-td.num, th.num { text-align: right; font-family: var(--mono); }
-
-footer.site { border-top: 1px solid var(--line); padding: 32px 0 56px; color: var(--dim); font-size: 13px; }
+[data-theme="dark"] .note { background: var(--accent-soft); }
 
 .scroll { overflow-x: auto; }
+
+/* Leaflet, brought into the system. Tiles print in black and white like every
+   other image, so the red dots are the only colour on the map. */
+.leaflet-container { background: var(--surface) !important; font-family: "Archivo", system-ui, sans-serif; }
+.leaflet-tile { filter: grayscale(1) contrast(1.04); }
+[data-theme="dark"] .leaflet-tile { filter: grayscale(1) brightness(.8) contrast(1.1); }
+.leaflet-control-zoom a {
+  background: var(--raise) !important; color: var(--ink) !important;
+  border-color: var(--line) !important; border-radius: 0 !important; font-weight: 700;
+}
+.leaflet-control-zoom a:hover { background: var(--accent) !important; color: #fff !important; }
+.leaflet-control-attribution { background: var(--raise) !important; color: var(--dim) !important; font-size: 10px !important; }
+.leaflet-control-attribution a { color: var(--muted) !important; }
+.leaflet-tooltip {
+  background: var(--ink) !important; color: var(--bg) !important;
+  border: 0 !important; border-radius: 0 !important; box-shadow: var(--sh-lg) !important;
+  font-family: "Archivo", system-ui, sans-serif !important; font-size: 12px !important;
+  padding: 8px 11px !important;
+}
+.leaflet-tooltip-top:before { border-top-color: var(--ink) !important; }

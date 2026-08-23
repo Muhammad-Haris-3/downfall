@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import Shell from "@/components/Shell";
 
 export const metadata: Metadata = {
-  title: "Downfall — the demand that was never recorded",
+  title: "Downfall — an empty dock records no demand",
   description:
     "A station with no bikes records no demand. Downfall measures when every " +
     "station in New York's bike share becomes unusable, and what that hides.",
@@ -10,27 +11,20 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="light">
+      <head>
+        {/* Applied before first paint, so a reader who chose dark never sees a
+            white flash on the way to it. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('downfall-theme');" +
+              "document.documentElement.setAttribute('data-theme',t==='dark'?'dark':'light')}catch(e){}",
+          }}
+        />
+      </head>
       <body>
-        <header className="site">
-          <div className="wrap">
-            <span className="name">Downfall</span>
-            <nav>
-              <a href="/">Network</a>
-              <a href="/conditions/">Conditions</a>
-              <a href="/method/">Method</a>
-              <a href="https://github.com/Muhammad-Haris-3/downfall">Source</a>
-            </nav>
-          </div>
-        </header>
-        {children}
-        <footer className="site">
-          <div className="wrap">
-            Muhammad Haris Khokhar ·{" "}
-            <a href="https://github.com/Muhammad-Haris-3/downfall">source and data</a>{" "}
-            · Trip data: Citi Bike system data. Availability: GBFS.
-          </div>
-        </footer>
+        <Shell>{children}</Shell>
       </body>
     </html>
   );

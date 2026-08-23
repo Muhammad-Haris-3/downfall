@@ -74,3 +74,35 @@ That is precisely the quantity this project argues is wrong, so no figure is
 labelled "demand" without qualification, and no station is described as
 under-served. Both await thresholds fixed in `PREREGISTRATION.md` before the
 data existed.
+
+## The design system
+
+**Modernist** — flat and architectural, set entirely in Archivo: a near-mono red
+(`#ec3013`) on a light ground, a visible modular grid, **zero corner radius**,
+and strong 2px rules. Nothing floats and nothing is decorated; alignment and the
+weight of the dividers do all the organising, and everything sits flush left,
+including the labels inside buttons.
+
+The tokens live at the top of `src/app/globals.css`. Take every colour, size and
+shadow from a `var(--…)` — a raw hex or px here is a bug, because the palette is
+the one thing that has to stay consistent when the accent runs as a full field
+in the poster sections.
+
+**Theme is an explicit choice, not `prefers-color-scheme`.** The palette is part
+of the argument the site makes, so a reader who picks one is not overridden by
+their operating system. A tiny inline script applies the stored choice before
+first paint, so a dark-mode reader never sees a white flash on the way in.
+
+## Station detail is an overlay, not a route
+
+The map is the context for every station, and navigating away to read one and
+back to find the next throws that context away each time. Clicking a red dot —
+or picking a search result — opens the panel over the map.
+
+`/station/<id>/` still exists and renders **the same component**, embedded
+rather than modal, so a shared link lands on exactly what the reader would have
+seen in context. One component, two framings; there is no second implementation
+to drift.
+
+Only the cohort's weekly profiles are shipped to the browser. The full
+`profiles.json` is 2.5 MB and the other 2,191 stations have no detail view.
