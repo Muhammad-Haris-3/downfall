@@ -3584,7 +3584,7 @@
 "short": "5311.08"
 },
 "1960020817312746312": {
-"cap": 116,
+"cap": 117,
 "lat": 40.71606,
 "lon": -73.99191,
 "name": "Allen St & Hester St",
@@ -9219,7 +9219,7 @@
 "short": "5326.06"
 },
 "66dba0ba-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 42,
+"cap": 36,
 "lat": 40.71739973,
 "lon": -73.98016555,
 "name": "Columbia St & Rivington St",
@@ -16191,7 +16191,7 @@
 "short": "6679.11"
 },
 "d5ca6311-7471-480f-9c79-38baaafe34ba": {
-"cap": 20,
+"cap": 29,
 "lat": 40.69329,
 "lon": -73.92852,
 "name": "Broadway & Kosciuszko St",
