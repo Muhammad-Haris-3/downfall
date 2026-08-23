@@ -21,6 +21,11 @@ def events(tmp_path, monkeypatch):
     d.mkdir()
     monkeypatch.setattr(cp, "EVENTS", d)
     monkeypatch.setattr(cp, "STATE", tmp_path / "open.json")
+    # HEARTBEAT must be redirected too, or these tests read the repository's own
+    # heartbeat. That file is absent on a development machine and present in CI,
+    # so leaving it unpatched made the suite pass locally and fail on push -
+    # the test was reporting on the machine it ran on, not on the code.
+    monkeypatch.setattr(cp, "HEARTBEAT", tmp_path / "collector.json")
     monkeypatch.setattr(cp, "RETRIES", 2)
     monkeypatch.setattr(cp, "WAIT_S", 0)
     return d
