@@ -1,0 +1,25 @@
+{
+  "why": "Runs that wrote events but never recorded their coverage, and whose heartbeats were overwritten before recover_abandoned_run() existed. Their observed time is permanently uncountable. Listed here so the health check stops warning about a fact that cannot change, and so the fact itself stays on the record rather than disappearing with the warning.",
+  "consequence": "Their collected hours are absent from the coverage total, which understates coverage. That is the conservative direction, and it is left uncorrected: recovering the span from event timestamps would be an inferred measurement, and this project does not credit itself for time it cannot show it observed.",
+  "fixed_by": "recover_abandoned_run(), FINDINGS M1-T8f. No run after 2026-08-23 can join this list.",
+  "runs": [
+    {
+      "run": "ba0f0b99c6b2",
+      "events": 49,
+      "events_span_utc": ["2026-08-21T07:38", "2026-08-21T08:07"],
+      "cause": "Cancelled by hand while the unlinked-file data loss of M1-T8b was being diagnosed."
+    },
+    {
+      "run": "eb31dca81ddb",
+      "events": 6300,
+      "events_span_utc": ["2026-08-22T18:23", "2026-08-22T22:26"],
+      "cause": "Ended without writing its coverage row. The 351-minute hole this left in the record is what led to the recovery mechanism existing at all."
+    },
+    {
+      "run": "ee476ab3203c",
+      "events": 4201,
+      "events_span_utc": ["2026-08-23T17:47", "2026-08-23T20:18"],
+      "cause": "In flight when the fix was written; its heartbeat predated the `started` field, so there was nothing to bound a recovered row with."
+    }
+  ]
+}

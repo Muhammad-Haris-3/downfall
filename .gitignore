@@ -27,6 +27,9 @@ data/state/*
 # of this list when it was added, so the live-run coverage fix silently did
 # nothing in CI - the file never got there. See FINDINGS M1-T8f.
 !data/state/collector.json
+# The three runs whose coverage can never be recovered. Tracked because it is
+# the record of a permanent hole, and a hole nobody can see is not recorded.
+!data/state/orphan_runs.json
 
 !data/runs.ndjson
 !data/stations.json

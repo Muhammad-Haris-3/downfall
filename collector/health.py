@@ -110,14 +110,27 @@ def main():
             live = json.loads(HEARTBEAT.read_text()).get("run")
         except (OSError, ValueError):
             live = None
+    # Three runs from before the recovery existed can never be recovered: their
+    # heartbeats were overwritten before anything read them. Excluded by name
+    # rather than left to warn forever - a warning that cannot ever clear is how
+    # a reader learns to skip the warnings, and then the next real one is
+    # invisible too. The fact stays recorded in the file itself.
+    known = set()
+    orphan_file = ROOT / "data" / "state" / "orphan_runs.json"
+    if orphan_file.exists():
+        known = {r["run"] for r in json.loads(orphan_file.read_text())["runs"]}
+
     wrote_events = {e.get("run") for e in iter_events()} - {None, "reconcile-m1-t8b"}
-    orphans = wrote_events - recorded - {live}
+    orphans = wrote_events - recorded - {live} - known
     check(not orphans,
           "every run that wrote events recorded its coverage"
           if not orphans else
-          "{} run(s) wrote events but no coverage row: {}".format(
+          "{} NEW run(s) wrote events but no coverage row: {}".format(
               len(orphans), ", ".join(sorted(orphans))),
           fatal=False)
+    if known & wrote_events:
+        print("  info  {} run(s) permanently uncountable, see "
+              "data/state/orphan_runs.json".format(len(known & wrote_events)))
 
     # 6. Outages whose close never arrived. Excluded from every duration figure,
     #    so a rise costs completeness rather than correctness - a warning.
