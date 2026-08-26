@@ -3444,7 +3444,7 @@
 "short": "4249.01"
 },
 "1934749166596673908": {
-"cap": 45,
+"cap": 46,
 "lat": 40.72980619180496,
 "lon": -73.99546380915461,
 "name": "Washington Pl & Greene St",
@@ -5831,7 +5831,7 @@
 "short": "4194.01"
 },
 "2250947145293496720": {
-"cap": 4,
+"cap": 18,
 "lat": 40.68243,
 "lon": -73.89272,
 "name": "Highland Blvd & Bulwer Pl",
@@ -10402,7 +10402,7 @@
 "short": "4697.01"
 },
 "66dcca0d-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 23,
+"cap": 22,
 "lat": 40.69539817,
 "lon": -73.94954908,
 "name": "Myrtle Ave & Marcy Ave",
@@ -10486,7 +10486,7 @@
 "short": "5084.03"
 },
 "66dcec6b-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 35,
+"cap": 36,
 "lat": 40.70870368,
 "lon": -73.9448625,
 "name": "Scholes St & Manhattan Ave",
