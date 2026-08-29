@@ -56,7 +56,7 @@
 "short": "6608.09"
 },
 "014a931b-8e1c-438a-8a22-f267ddd1e0d2": {
-"cap": 45,
+"cap": 44,
 "lat": 40.7075188830923,
 "lon": -74.00108054280281,
 "name": "Peck Slip & South St",
@@ -3934,7 +3934,7 @@
 "short": "8021.11"
 },
 "1fba77e2-66ab-4e9c-9f9a-4ec4f11fd80b": {
-"cap": 28,
+"cap": 0,
 "lat": 40.849955,
 "lon": -73.905943,
 "name": "Echo Pl & Grand Concourse",
@@ -9177,7 +9177,7 @@
 "short": "5159.04"
 },
 "66db93a1-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 5,
+"cap": 36,
 "lat": 40.71219906,
 "lon": -73.97948148,
 "name": "Cherry St",
