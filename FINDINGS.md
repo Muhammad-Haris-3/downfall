@@ -1038,3 +1038,85 @@ runs inside the job it is checking shares that job's failure modes. That is
 precisely why M1-T8b stayed hidden: everything reporting on the collector was
 part of the collector.
 
+
+---
+
+## M1-T8g — The chain was running on a margin of 0.2, and GitHub took it away
+
+Coverage since collection began is **75.7%**, against a floor of 95%. Daily:
+
+```
+08-21   69.4%  ###########################
+08-22   76.8%  ##############################
+08-23   74.3%  #############################
+08-24   99.8%  #######################################
+08-25   99.8%  #######################################
+08-26   99.8%  #######################################
+08-27   69.7%  ###########################
+08-28   63.5%  #########################
+08-29   88.6%  ###################################
+08-30   99.9%  #######################################
+```
+
+The first three days are the setup and the M1-T8b diagnosis, and were expected.
+**27–28 August were not.** Nothing was being changed; the collector was simply
+losing six to nine hours a day.
+
+### Cause
+
+A 350-minute run keeps the chain alive only if a trigger lands *while it is
+still running* — that queues the successor, which then starts within seconds of
+the incumbent exiting. That needs `24 / 5.83 ≈ 4.2` delivered triggers a day.
+
+The cron was hourly: 24 nominal fires for a requirement of 4.2, which reads like
+ample margin. What GitHub actually delivered:
+
+| | Triggers delivered | Coverage |
+|---|---|---|
+| 24–26 Aug | 22–23 / day | 99.8% |
+| **27 Aug** | **3** | **69.7%** |
+| **28 Aug** | **2** | **63.5%** |
+| 30 Aug | 4 | 99.9% |
+
+For two days the scheduler dropped roughly nine tenths of the fires. The chain
+broke six times, with gaps of 66, 97, 116, 152, 284 and 410 minutes.
+
+**The margin was never 24 against 4.2.** It was 24 nominal against a delivery
+rate that is entirely outside our control and moves without warning. Requiring
+4.2 of 24 means requiring an 18% delivery rate, and the platform went below it.
+
+### Fix
+
+Four cron entries an hour instead of one — `7,22,37,52`, minutes nobody else
+picks, since everyone's `0 * * * *` is the most contended slot on the platform.
+96 nominal fires for the same 4.2 requirement: the same 90% drop rate now leaves
+~10 a day, comfortably clear.
+
+Extra triggers cost nothing. The concurrency group holds one run in flight and
+one queued and supersedes the rest, so a fire that lands on a full group is
+discarded by GitHub rather than by us.
+
+### The check that should have caught it, and did not
+
+`health.py` measures coverage over the **last 24 hours**. It ran throughout
+27–28 August and reported nothing, because by the time anyone reads it the bad
+day has already rolled out of the window. On 30 August it read **97.6%** while
+the week behind it was **86.0%**.
+
+A 24-hour window cannot see a two-day failure that ended yesterday. Added:
+
+- **coverage over 7 days**, warning below 93% — long enough to hold a bad patch,
+  short enough to clear once it is fixed. It reads 86.0% today, which is the
+  warning that was missing all week.
+- **runs started in the last 24 hours**, warning below 4 — watching the cause
+  directly rather than only its consequence, since the trigger count collapses
+  a day before the coverage figure reflects it.
+
+### What it costs the milestone
+
+The §3 floor needs 95% across 21 days. At 75.7% to date, the bad days have to
+age out of the trailing window before it can clear, and each new bad patch
+pushes that back. **The 11 September estimate no longer holds**, and no new date
+is offered here: the input that decides it is GitHub's delivery rate, which is
+not ours to forecast. It will be reported when the window actually clears.
+

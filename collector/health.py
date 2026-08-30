@@ -37,6 +37,8 @@ EVENTS = ROOT / "data" / "events"
 # for two hours means collection has stopped, not that it is between commits.
 STALE_HOURS = 2.0
 MIN_RECENT_COVERAGE = 0.90     # warn below; steady state is ~99.9%
+MIN_WEEK_COVERAGE = 0.93       # the floor is 95% over 21 days; warn before it bites
+MIN_RUNS_PER_DAY = 4           # a 350-min run needs ~4.2 handovers a day
 MAX_LOST_CLOSE_RATE = 0.05     # warn above; currently ~2.9%
 
 fails, warns = [], []
@@ -94,6 +96,28 @@ def main():
     frac = cov / base if base > 0 else 0.0
     check(frac >= MIN_RECENT_COVERAGE,
           "coverage last 24h {:.1%}".format(frac), fatal=False)
+
+    # A 24-hour window is too short to see the failure it was meant to see.
+    # Collection lost six hours a day on 27-28 August when GitHub delivered two
+    # or three triggers instead of twenty-two; by the time anyone looked, those
+    # days had already rolled out of the 24-hour window and it read 99.9%. Seven
+    # days is long enough to hold a bad patch and short enough to clear once it
+    # is fixed.
+    week = now - 7 * 86400
+    wk = [r for r in runs if r["end"] > week]
+    wk_cov = sum(min(r["end"], now) - max(r["start"], week) for r in wk)
+    wk_span = now - max(week, min((r["start"] for r in runs), default=now))
+    wk_frac = wk_cov / wk_span if wk_span > 0 else 0.0
+    check(wk_frac >= MIN_WEEK_COVERAGE,
+          "coverage last 7d {:.1%}".format(wk_frac), fatal=False)
+
+    # The chain survives on triggers landing while a run is still going. Below
+    # about 4.2 a day it breaks, so the count itself is worth watching rather
+    # than only its consequence.
+    day_runs = [r for r in runs if r["end"] > day]
+    check(len(day_runs) >= MIN_RUNS_PER_DAY,
+          "{} run(s) started in the last 24h (chain needs ~4)".format(len(day_runs)),
+          fatal=False)
 
     # 5. Every run that wrote events also recorded what it observed.
     #
