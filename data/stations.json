@@ -7182,7 +7182,7 @@
 "short": "3922.02"
 },
 "3fed8016-0be0-47f5-8663-2e850ec47288": {
-"cap": 23,
+"cap": 0,
 "lat": 40.87069,
 "lon": -73.90678,
 "name": "Bailey Ave & W 193 St",
@@ -14903,7 +14903,7 @@
 "short": "5721.07"
 },
 "b713367c-3572-4225-b74a-9319ab537838": {
-"cap": 19,
+"cap": 0,
 "lat": 40.859532,
 "lon": -73.913303,
 "name": "Sedgwick Ave & Hall of Fame Terrace",
@@ -17206,7 +17206,7 @@
 "short": "4576.11"
 },
 "f47e1ce9-ff3f-49e9-9a2f-aa5be45d70da": {
-"cap": 23,
+"cap": 22,
 "lat": 40.811112,
 "lon": -73.914932,
 "name": "St Ann's Ave & E 144 St",
