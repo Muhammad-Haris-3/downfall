@@ -9464,7 +9464,7 @@
 "short": "4710.06"
 },
 "66dbec40-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 54,
+"cap": 55,
 "lat": 40.72299208,
 "lon": -73.97995466,
 "name": "E 5 St & Ave C",
@@ -9618,7 +9618,7 @@
 "short": "7023.04"
 },
 "66dc0f1b-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 68,
+"cap": 69,
 "lat": 40.701907,
 "lon": -74.013942,
 "name": "Bus Slip & State St",
@@ -10157,7 +10157,7 @@
 "short": "6079.03"
 },
 "66dc8a3d-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 78,
+"cap": 79,
 "lat": 40.74025878,
 "lon": -73.98409214,
 "name": "Lexington Ave & E 24 St",
@@ -10675,7 +10675,7 @@
 "short": "5826.02"
 },
 "66dd20eb-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 34,
+"cap": 35,
 "lat": 40.73266,
 "lon": -73.95826,
 "name": "Huron St & Franklin St",
@@ -10717,7 +10717,7 @@
 "short": "6212.04"
 },
 "66dd24ca-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 45,
+"cap": 47,
 "lat": 40.74469738,
 "lon": -73.93540375,
 "name": "31 St & Thomson Ave",
@@ -11781,7 +11781,7 @@
 "short": "4137.10"
 },
 "66de1580-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 39,
+"cap": 1,
 "lat": 40.6729679,
 "lon": -73.97087984,
 "name": "Grand Army Plaza & Plaza St West",
@@ -12264,7 +12264,7 @@
 "short": "7524.16"
 },
 "66de88d7-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 45,
+"cap": 47,
 "lat": 40.692418292578466,
 "lon": -73.98949474096298,
 "name": "Fulton St & Adams St",
@@ -14245,7 +14245,7 @@
 "short": "7888.10"
 },
 "a2f71eea-05a2-4fe7-99ab-f74535c880ae": {
-"cap": 23,
+"cap": 24,
 "lat": 40.676368,
 "lon": -73.952918,
 "name": "Bedford Ave & Bergen St",
@@ -17353,7 +17353,7 @@
 "short": "8099.04"
 },
 "fadf00cf-d84a-49e8-9607-c67154915412": {
-"cap": 25,
+"cap": 26,
 "lat": 40.74816121065146,
 "lon": -74.0324530005455,
 "name": "Columbus Park - Clinton St & 9 St",
