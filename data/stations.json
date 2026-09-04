@@ -3836,7 +3836,7 @@
 "short": "8111.07"
 },
 "1dacb0f6-29f5-4d1b-b910-92ffa5b4ca5d": {
-"cap": 42,
+"cap": 0,
 "lat": 40.6707767,
 "lon": -73.9576801,
 "name": "Eastern Pkwy & Franklin Ave (NE Corner)",
@@ -13846,7 +13846,7 @@
 "short": "7669.10"
 },
 "96a4da57-107a-43d1-8828-4749d5555461": {
-"cap": 30,
+"cap": 0,
 "lat": 40.668757,
 "lon": -73.966438,
 "name": "Flatbush Ave & Eastern Pkwy",
@@ -16779,7 +16779,7 @@
 "short": "5010.02"
 },
 "e63c8dac-ab44-48c8-83a0-92c53a00f12e": {
-"cap": 31,
+"cap": 0,
 "lat": 40.6716493,
 "lon": -73.9631145,
 "name": "Eastern Pkwy & Washington Ave",
