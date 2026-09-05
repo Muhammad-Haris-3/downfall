@@ -5964,7 +5964,7 @@
 "short": "3891.02"
 },
 "2250950056568561652": {
-"cap": 0,
+"cap": 12,
 "lat": 40.66985,
 "lon": -73.8914,
 "name": "Bradford St & Sutter Ave",
@@ -5985,49 +5985,49 @@
 "short": "3820.07"
 },
 "2250950473840751128": {
-"cap": 0,
+"cap": 12,
 "lat": 40.66777,
 "lon": -73.895,
 "name": "Blake Ave & Pennsylvania Ave",
 "short": "3851.03"
 },
 "2250950615627071938": {
-"cap": 0,
+"cap": 16,
 "lat": 40.669,
 "lon": -73.88738,
 "name": "Blake Ave & Schenck Ave",
 "short": "3883.06"
 },
 "2250952460135944340": {
-"cap": 0,
+"cap": 12,
 "lat": 40.66648,
 "lon": -73.89359,
 "name": "Dumont Ave & New Jersey Ave",
 "short": "3780.06"
 },
 "2250952630016597152": {
-"cap": 0,
+"cap": 16,
 "lat": 40.66697,
 "lon": -73.89068,
 "name": "Bradford St & Dumont Ave",
 "short": "3812.06"
 },
 "2250952758815752682": {
-"cap": 0,
+"cap": 16,
 "lat": 40.66759,
 "lon": -73.88609,
 "name": "Dumont Ave & Barbey St",
 "short": "3843.02"
 },
 "2250952899836909606": {
-"cap": 0,
+"cap": 18,
 "lat": 40.6639,
 "lon": -73.90032,
 "name": "Livonia Ave & Van Sinderen Ave",
 "short": "3749.01"
 },
 "2250953016513790446": {
-"cap": 0,
+"cap": 16,
 "lat": 40.66428,
 "lon": -73.89765,
 "name": "Livonia Ave & Williams Ave",
@@ -6041,28 +6041,28 @@
 "short": "3780.03"
 },
 "2250953269916860916": {
-"cap": 0,
+"cap": 14,
 "lat": 40.66526,
 "lon": -73.8911,
 "name": "Livonia Ave & Wyona St",
 "short": "3740.04"
 },
 "2250953386700435630": {
-"cap": 0,
+"cap": 16,
 "lat": 40.66579,
 "lon": -73.88643,
 "name": "Livonia Ave & Schenck Ave",
 "short": "3772.03"
 },
 "2250953519844421810": {
-"cap": 0,
+"cap": 16,
 "lat": 40.66602,
 "lon": -73.88341,
 "name": "New Lots Ave & Ashford St",
 "short": "3804.01"
 },
 "2250953640103506100": {
-"cap": 0,
+"cap": 12,
 "lat": 40.66111,
 "lon": -73.89788,
 "name": "Hinsdale St & Newport St",
