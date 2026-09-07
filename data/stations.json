@@ -5750,7 +5750,7 @@
 "cap": 12,
 "lat": 40.65523,
 "lon": -73.90525,
-"name": "Osborn St & Linden BLvd",
+"name": "Osborn St & Linden Blvd",
 "short": "3461.04"
 },
 "2235294785609966518": {
@@ -9520,7 +9520,7 @@
 "short": "5593.02"
 },
 "66dbf215-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 51,
+"cap": 21,
 "lat": 40.739323,
 "lon": -74.008119,
 "name": "Washington St & Gansevoort St",
@@ -17213,7 +17213,7 @@
 "short": "6110.01"
 },
 "f5393bc2-36d4-4508-bf51-fa48d121f751": {
-"cap": 26,
+"cap": 27,
 "lat": 40.74091,
 "lon": -73.90273,
 "name": "61 St & Queens Blvd",
