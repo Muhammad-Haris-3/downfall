@@ -8113,7 +8113,7 @@
 "short": "8547.04"
 },
 "57f144cb-375d-4eee-b458-e288116cb8f7": {
-"cap": 20,
+"cap": 21,
 "lat": 40.73565914819229,
 "lon": -73.93478840589523,
 "name": "Bradley Ave & Greenpoint Ave",
@@ -8729,7 +8729,7 @@
 "short": "4812.02"
 },
 "66db2e3a-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 55,
+"cap": 4,
 "lat": 40.71625008,
 "lon": -74.0091059,
 "name": "Hudson St & Reade St",
@@ -9611,7 +9611,7 @@
 "short": "5593.02"
 },
 "66dbf215-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 50,
+"cap": 51,
 "lat": 40.739323,
 "lon": -74.008119,
 "name": "Washington St & Gansevoort St",
@@ -10969,7 +10969,7 @@
 "short": "7092.06"
 },
 "66dd491c-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 28,
+"cap": 29,
 "lat": 40.76663814,
 "lon": -73.95348296,
 "name": "E 72 St & York Ave",
@@ -16583,7 +16583,7 @@
 "short": "7137.04"
 },
 "dd351a72-4241-4275-843d-0fffa8a1f414": {
-"cap": 10,
+"cap": 25,
 "lat": 40.672695,
 "lon": -73.954131,
 "name": "Sterling Pl & Bedford Ave",
