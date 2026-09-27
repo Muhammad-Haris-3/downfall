@@ -43,6 +43,8 @@ data/state/*
 
 # The preliminary estimator validation. A result, not an input.
 !data/validation_preliminary.json
+# The §4 run. Committed by the export job the moment it exists.
+!data/validation_s4.json
 
 # Marts ARE tracked, despite being derived. Rebuilding one means pulling ~750 MB
 # from the bucket, so a repository that carries them is a repository someone can

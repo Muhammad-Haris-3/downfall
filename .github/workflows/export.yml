@@ -33,6 +33,15 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      # PREREGISTRATION.md §4, run exactly once: skipped for good once its
+      # result is committed, and a no-op (exit 2) until September's trips are
+      # aggregated. Run here rather than by hand so the result is public in the
+      # same push that produced it - nobody sees it first.
+      - name: §4 validation, once
+        run: |
+          if [ -e data/validation_s4.json ]; then echo "already run"; exit 0; fi
+          python analysis/validation.py || echo "exit $? - see output"
+
       - run: python pipeline/export_web.py
 
       - name: commit if changed
@@ -40,6 +49,7 @@ jobs:
           git config user.name  "downfall-export"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add web/public/data web/data
+          git add data/validation_s4.json 2>/dev/null || true
           if git diff --cached --quiet; then echo "no change"; exit 0; fi
           git commit -m "Export site data from the record"
           # The collector pushes to main every 30 minutes. Only data/ and web/

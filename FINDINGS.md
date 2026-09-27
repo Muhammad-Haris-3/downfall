@@ -1160,4 +1160,6 @@ by M1 spec §6, so the cohort condition is not the obstacle. It also caught a
 bug that would have voided the run: `astype(int64) // 1e9` on pandas 2
 timestamps put every trip in January 1970, where no outage could hide it.
 
-The run waits for September's trips, published around 4 October.
+The run waits for September's trips, published around 4 October. It is run by
+the daily export job, once, and its result committed in the same push - so the
+first person to see it sees it in public.
