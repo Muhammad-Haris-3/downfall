@@ -58,6 +58,9 @@ data/marts/*
 # a provenance record for a file nobody else had. The conditions analysis cannot
 # be reproduced from a clone without it.
 !data/marts/weather_hourly.parquet
+# Trip start times for the §4 window (~20 MB a month). The validation cannot be
+# reproduced from a clone without them. Only the months it needs are written.
+!data/marts/departures_*.parquet
 
 # Web app
 web/node_modules/

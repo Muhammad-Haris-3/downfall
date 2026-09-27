@@ -36,7 +36,9 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 BUCKET = "https://s3.amazonaws.com/tripdata/"
 LOCAL_TZ = "America/New_York"
-FIRST_OUTAGE_MONTH = "202608"   # collection began 2026-08-20
+# The §4 analysis window (analysis/validation.py). ~20 MB a month committed, so
+# only these; widen when a later analysis actually needs trip-level times.
+DEPARTURE_TIME_MONTHS = {"202608", "202609"}
 EPOCH = pd.Timestamp("1970-01-01", tz="UTC")
 COLS = ["started_at", "ended_at", "start_station_id", "end_station_id",
         "member_casual", "rideable_type"]
@@ -133,9 +135,7 @@ def main(target: str, out_dir: str = None):
     members = sorted(n for n in z.namelist()
                      if n.endswith(".csv") and not n.startswith("__MACOSX"))
 
-    # Trip-level start times only for months the outage record overlaps. Earlier
-    # months have no outages to borrow, so the extra file would never be read.
-    times = [] if month >= FIRST_OUTAGE_MONTH else None
+    times = [] if month in DEPARTURE_TIME_MONTHS else None
     dropped, n_raw, parts = {}, 0, []
     for n in members:
         with z.open(n) as f:
