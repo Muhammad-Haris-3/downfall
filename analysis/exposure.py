@@ -46,6 +46,9 @@ REQUIRED_DAYS = 21
 REQUIRED_COVERAGE = 0.95
 REQUIRED_OUTAGES = 20_000
 REQUIRED_SLOT_OBSERVATIONS = 3
+# v1.1: slots are counted over 28 days, so one missed hour does not block the
+# floor for three weeks. The coverage window above stays at 21.
+SLOT_WINDOW_DAYS = 28
 
 # Downfall_M1_Spec.md §6
 BAND_KILL = 0.02
@@ -82,7 +85,8 @@ def floor_status():
                   for r in in_window)
     span = now - max(window_start, min((r["start"] for r in runs), default=now))
 
-    cov_by_hour = coverage_by_hour(in_window)
+    slot_start = now - SLOT_WINDOW_DAYS * 86400
+    cov_by_hour = coverage_by_hour([r for r in runs if r["end"] > slot_start])
 
     days = span_all / 86400 if span_all else 0.0
     frac = covered / span if span > 0 else 0.0

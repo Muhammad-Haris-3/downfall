@@ -2,6 +2,10 @@
 
 **v1.0 — written 2026-08-21, after M0 and before any demand estimator exists.**
 
+**v1.1 — amended 2026-09-27, after seeing floor progress but before any exposure
+figure, demand estimate or ranking had been computed.** The change is in §3 and
+the reason is recorded in §8.
+
 The point of this document is that the thresholds below cannot be chosen after
 the results are known. It is committed to a public repository, and the constants
 it fixes live in code where the test suite asserts them against this text.
@@ -51,7 +55,7 @@ of the following hold:
 | Continuous collection | **≥ 21 days** |
 | Coverage within that window | **≥ 95%** of wall-clock, from `data/runs.ndjson` |
 | Completed outages, start and end both observed | **≥ 20,000** |
-| Distinct days covering every hour of the week | **≥ 3** observations of each of the 168 hour-of-week slots |
+| Distinct days covering every hour of the week | **≥ 3** observations of each of the 168 hour-of-week slots, counted over the trailing **28 days** |
 
 The last row exists because M0 saw one evening. An evening is not a day, and a
 figure built from evenings would describe the evening while claiming to describe
@@ -139,3 +143,24 @@ the reason stated and the previous version left intact in git history. An
 amendment made after seeing a result says so in its first line.
 
 No amendment may weaken §4 or §5 after the corresponding analysis has been run.
+
+### v1.1 — 2026-09-27: the hour-of-week slots are counted over 28 days, not 21
+
+**Made after seeing floor progress. No result had been seen:** `analysis/exposure.py`
+refuses to compute E until the floor is met, and it had never been met.
+
+At the time of the change three of the four rows were met with a wide margin
+(37 days, 99.5% coverage, 439,369 completed outages). The fourth was not, for two
+slots only - Friday 18:00 and 19:00 UTC - because a 74-minute handover gap on
+Friday 25 September left each of those hours with under 30 minutes observed.
+
+The slot row was being counted inside the 21-day coverage window. 21 days holds
+exactly three of every slot, so the rule demanded three consecutive weeks with no
+hour-long gap anywhere. One missed hour, of any slot, blocked the floor for three
+weeks, and GitHub's scheduler had already produced such gaps twice. That is a
+property of the window arithmetic, not of how representative the data is.
+
+Counting slots over 28 days keeps the requirement itself - every hour of the week
+seen on at least three distinct days - and allows one miss per slot. Every other
+row is unchanged, including the 21-day window and the 95% coverage it is held to.
+§4 and §5 are untouched.

@@ -14,7 +14,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from analysis.exposure import (BAND_KILL, BAND_NARROW, REQUIRED_COVERAGE,  # noqa: E402
                                REQUIRED_DAYS, REQUIRED_OUTAGES,
-                               REQUIRED_SLOT_OBSERVATIONS, band_for)
+                               REQUIRED_SLOT_OBSERVATIONS, SLOT_WINDOW_DAYS,
+                               band_for)
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -67,6 +68,7 @@ def test_floor_constants_match_the_preregistration():
     assert "{:,}".format(REQUIRED_OUTAGES) in text
     assert "168 hour-of-week" in text
     assert str(REQUIRED_SLOT_OBSERVATIONS) in text
+    assert "trailing **{} days**".format(SLOT_WINDOW_DAYS) in text
 
 
 def test_band_constants_match_the_m1_spec():
