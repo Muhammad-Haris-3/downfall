@@ -20,6 +20,10 @@ on:
         description: "Rebuild every month, including ones already done"
         type: boolean
         default: false
+      month:
+        description: "Rebuild just this month (YYYYMM), even if done"
+        type: string
+        default: ""
   schedule:
     # Daily on the 3rd to the 10th. The lag is a median of ~3 days, not a
     # promise: August 2026 was not up on 6 September, and a once-a-month cron
@@ -45,7 +49,9 @@ jobs:
       - id: list
         run: |
           set -euo pipefail
-          if [ "${{ github.event.inputs.all }}" = "true" ]; then
+          if [[ "${{ github.event.inputs.month }}" =~ ^[0-9]{6}$ ]]; then
+            MONTHS='["${{ github.event.inputs.month }}"]'
+          elif [ "${{ github.event.inputs.all }}" = "true" ]; then
             MONTHS=$(python pipeline/list_months.py --all)
           else
             MONTHS=$(python pipeline/list_months.py)
