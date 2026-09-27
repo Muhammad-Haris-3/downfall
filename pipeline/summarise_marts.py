@@ -23,7 +23,9 @@ MARTS = Path(__file__).resolve().parent.parent / "data" / "marts"
 
 def load():
     out = []
-    for p in sorted(MARTS.glob("manifest_*.json")):
+    # Monthly manifests only. manifest_weather.json has a different shape, and
+    # matching it here crashed the first aggregation after it was added.
+    for p in sorted(MARTS.glob("manifest_[0-9]*.json")):
         out.append(json.loads(p.read_text(encoding="utf-8")))
     return out
 
