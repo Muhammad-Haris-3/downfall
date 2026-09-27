@@ -103,8 +103,9 @@ export default function Method() {
         <div className="note" style={{ marginBottom: 30 }}>
           <strong>No demand estimate exists and no station has been ranked.</strong>{" "}
           Nothing on this site describes any station as under-served, because the
-          coverage floor has not been met and the estimator has not been
-          validated. Both thresholds were set before the data existed.
+          estimator has not been validated. The coverage floor has been met, so
+          hours each station spent empty are published; the validation threshold
+          was set before the data existed and has not yet been run.
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20 }}>
