@@ -33,6 +33,9 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+from analysis.censoring import censored_minutes, coverage_by_hour   # noqa: E402
+from analysis.exposure import REQUIRED_DAYS, floor_status           # noqa: E402
 MARTS = ROOT / "data" / "marts"
 STATIONS = ROOT / "data" / "stations.json"
 COHORT = ROOT / "data" / "cohort_top200.json"
@@ -69,6 +72,34 @@ def hour_of_week(df):
     here for the same reason.
     """
     return df["dow_local"].astype("int32") * 24 + df["hour_local"].astype("int32")
+
+
+def hours_empty():
+    """Hours each station spent with no bikes, over the §3 window.
+
+    Returns (by_short, window) or (None, None) while the floor is unmet: the
+    pre-registration forbids publishing a stockout figure before it holds, so
+    the card stays blank rather than showing a number captioned "early".
+    Only outages with both ends observed count, as in every duration figure.
+    """
+    met, _, outages, runs, _ = floor_status()
+    if not met:
+        return None, None
+    now = max(r["end"] for r in runs)
+    start = now - REQUIRED_DAYS * 86400
+    in_window = [r for r in runs if r["end"] > start]
+    rows, _ = censored_minutes(outages, in_window)
+    by_short = {}
+    for r in rows:
+        if r["short"] and r["hour_utc"] >= start:
+            by_short[r["short"]] = by_short.get(r["short"], 0.0) + r["empty_s"]
+    watched = sum(s for h, s in coverage_by_hour(in_window).items() if h >= start)
+    window = {
+        "from": datetime.fromtimestamp(start, timezone.utc).date().isoformat(),
+        "to": datetime.fromtimestamp(now, timezone.utc).date().isoformat(),
+        "watched_h": round(watched / 3600),
+    }
+    return {k: round(v / 3600, 1) for k, v in by_short.items()}, window
 
 
 def main():
@@ -112,6 +143,10 @@ def main():
     arr_all = arr_all.reshape(len(uniques), 168).astype("int64")
     index_of = {s: i for i, s in enumerate(uniques)}
 
+    empty, window = hours_empty()
+    print("  hours empty: " + ("floor not met, left blank" if window is None
+                               else "{from} to {to}".format(**window)))
+
     network, profiles, unresolved = [], {}, 0
     for short, row in totals.iterrows():
         info = by_short.get(short)
@@ -133,6 +168,10 @@ def main():
             "arr": int(row["arrivals"]),
             "top200": short in cohort,
         })
+        if window is not None:
+            # A station never seen empty has no row, and that is a measured 0.
+            network[-1]["empty_h"] = empty.get(short, 0.0)
+            network[-1]["watched_h"] = window["watched_h"]
         profiles[short] = {
             "dep": [int(x) for x in prof_dep],
             "arr": [int(x) for x in prof_arr],
@@ -153,6 +192,7 @@ def main():
         "caveat": ("Observed departures understate demand at any station that "
                    "ran out of bikes. Correcting for that is the project's "
                    "subject and no correction is applied here."),
+        "outage_window": window,
         "network": network,
     }
     (PUBLIC / "network.json").write_text(json.dumps(payload, separators=(",", ":")))

@@ -7,6 +7,8 @@ import StationPanel from "./StationPanel";
 export type Station = {
   s: string; n: string; lat: number; lon: number;
   cap: number | null; dep: number; arr: number; rank: number; top200: boolean;
+  /** Present only once the §3 floor is met. */
+  empty_h?: number; watched_h?: number;
 };
 export type Profiles = Record<string, { dep: number[]; arr: number[] }>;
 

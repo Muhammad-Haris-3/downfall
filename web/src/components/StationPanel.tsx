@@ -141,8 +141,20 @@ export default function StationPanel({
           </div>
           <div className="card">
             <div className="k">Hours unusable</div>
-            <div className="v" style={{ color: "var(--dim)" }}>—</div>
-            <div className="d">Not published. Needs the coverage floor in §3 of the pre-registration.</div>
+            {station.empty_h != null && station.watched_h ? (
+              <>
+                <div className="v">{Math.round(station.empty_h)} h</div>
+                <div className="d">
+                  Empty of bikes, out of {station.watched_h} hours watched over the
+                  last 21 days ({((100 * station.empty_h) / station.watched_h).toFixed(1)}%).
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="v" style={{ color: "var(--dim)" }}>—</div>
+                <div className="d">Not published. Needs the coverage floor in §3 of the pre-registration.</div>
+              </>
+            )}
           </div>
           <div className="card">
             <div className="k">Estimated true demand</div>
@@ -152,7 +164,7 @@ export default function StationPanel({
         </div>
 
         <div className="note" style={{ marginTop: 26 }}>
-          <strong>The two blank cards are the project.</strong> Everything the
+          <strong>The last two cards are the project.</strong> Everything the
           trip archive alone can tell you sits above them, and none of it says
           how many people wanted a bike here and did not get one. That number is
           not small, it is not random, and it is in no published dataset.

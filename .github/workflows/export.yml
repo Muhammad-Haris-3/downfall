@@ -1,0 +1,51 @@
+name: export
+
+# Regenerate the site's data from the committed record, once a day.
+#
+# The collector commits data/ and never web/, so without this the site shows
+# whatever export_web.py produced the last time somebody ran it by hand. The
+# per-station hours-empty figure moves with the outage record, and appears at
+# all only once the §3 floor is met - which is a fact about the record, not a
+# date anyone can schedule a manual run for.
+#
+# A push to web/ is what redeploys the site.
+
+on:
+  schedule:
+    - cron: "41 6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: downfall-export
+  cancel-in-progress: false
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - run: pip install -r requirements.txt
+
+      - run: python pipeline/export_web.py
+
+      - name: commit if changed
+        run: |
+          git config user.name  "downfall-export"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/public/data web/data
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -m "Export site data from the record"
+          # The collector pushes to main every 30 minutes. Only data/ and web/
+          # are touched, never the same files, so a rebase always replays.
+          for attempt in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase origin main
+          done
+          exit 1
