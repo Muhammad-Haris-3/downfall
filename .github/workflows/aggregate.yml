@@ -21,8 +21,11 @@ on:
         type: boolean
         default: false
   schedule:
-    # The 6th of each month, comfortably after the ~3-day publication lag.
-    - cron: "40 5 6 * *"
+    # Daily on the 3rd to the 10th. The lag is a median of ~3 days, not a
+    # promise: August 2026 was not up on 6 September, and a once-a-month cron
+    # would have left it unaggregated until 6 October. A month already done has
+    # a manifest and is skipped, so the repeat runs cost a bucket listing.
+    - cron: "40 5 3-10 * *"
 
 concurrency:
   group: downfall-aggregate

@@ -36,6 +36,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 BUCKET = "https://s3.amazonaws.com/tripdata/"
 LOCAL_TZ = "America/New_York"
+FIRST_OUTAGE_MONTH = "202608"   # collection began 2026-08-20
+EPOCH = pd.Timestamp("1970-01-01", tz="UTC")
 COLS = ["started_at", "ended_at", "start_station_id", "end_station_id",
         "member_casual", "rideable_type"]
 
@@ -74,8 +76,13 @@ def to_utc(series: pd.Series, dropped: dict, label: str) -> pd.Series:
     return local.dt.tz_convert("UTC")
 
 
-def aggregate_member(df: pd.DataFrame, dropped: dict) -> pd.DataFrame:
-    """One CSV's worth of trips -> station-hour counts. Never sees the others."""
+def aggregate_member(df: pd.DataFrame, dropped: dict, times: list = None) -> pd.DataFrame:
+    """One CSV's worth of trips -> station-hour counts. Never sees the others.
+
+    `times`, if given, collects each departure's (station, epoch second). The §4
+    validation removes the trips that started inside a borrowed outage, and
+    that needs when each trip started, not only which hour it fell in.
+    """
     df["dep_utc"] = to_utc(df["started_at"], dropped, "started_at")
     df["arr_utc"] = to_utc(df["ended_at"], dropped, "ended_at")
     for c in ("start_station_id", "end_station_id"):
@@ -88,6 +95,12 @@ def aggregate_member(df: pd.DataFrame, dropped: dict) -> pd.DataFrame:
                  & (df["start_station_id"] != ""),
                  ["start_station_id", "dep_utc", "member_casual", "rideable_type"]]
     dep = dep.rename(columns={"start_station_id": "station"})
+    if times is not None:
+        times.append(pd.DataFrame({
+            "station": dep["station"].to_numpy(),
+            # Not astype(int64) // 1e9: pandas 2 may store these in ms or s,
+            # and that division then yields a date in January 1970.
+            "t": ((dep["dep_utc"] - EPOCH) // pd.Timedelta("1s")).astype("int32")}))
     dep["hour_utc"] = dep["dep_utc"].dt.floor("h")
     # Flags precomputed as integers so the grouping is a plain sum. A lambda
     # here runs once per group and turns a 20-second job into a 20-minute one.
@@ -120,13 +133,16 @@ def main(target: str, out_dir: str = None):
     members = sorted(n for n in z.namelist()
                      if n.endswith(".csv") and not n.startswith("__MACOSX"))
 
+    # Trip-level start times only for months the outage record overlaps. Earlier
+    # months have no outages to borrow, so the extra file would never be read.
+    times = [] if month >= FIRST_OUTAGE_MONTH else None
     dropped, n_raw, parts = {}, 0, []
     for n in members:
         with z.open(n) as f:
             df = pd.read_csv(io.TextIOWrapper(f, encoding="utf-8", errors="replace"),
                              usecols=COLS, dtype=str)
         n_raw += len(df)
-        parts.append(aggregate_member(df, dropped))
+        parts.append(aggregate_member(df, dropped, times))
         del df
         print("    {}: {:,} rows -> {:,} station-hours".format(
             n, n_raw, len(parts[-1])), flush=True)
@@ -146,6 +162,16 @@ def main(target: str, out_dir: str = None):
 
     path = out / "trip_counts_{}.parquet".format(month)
     counts.to_parquet(path, index=False, compression="zstd")
+
+    if times is not None:
+        # Sorted by station then time, so each station's run of seconds is
+        # near-monotonic and zstd stores it as small deltas.
+        dep_times = (pd.concat(times, ignore_index=True)
+                       .sort_values(["station", "t"], kind="stable"))
+        dep_times["station"] = dep_times["station"].astype("category")
+        dep_times.to_parquet(out / "departures_{}.parquet".format(month),
+                             index=False, compression="zstd")
+        del times, dep_times
 
     manifest = {
         "month": month,

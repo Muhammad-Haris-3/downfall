@@ -1120,3 +1120,44 @@ pushes that back. **The 11 September estimate no longer holds**, and no new date
 is offered here: the input that decides it is GitHub's delivery rate, which is
 not ours to forecast. It will be reported when the window actually clears.
 
+
+---
+
+## M1-T4 — E = 45.9%: censoring is not a detail, it is half the busy network
+
+Run on 2026-09-27, after pre-registration v1.1 was committed and pushed
+(`ef52e88`) and not before. §3 floor met in full.
+
+| | |
+|---|---|
+| **E**, share of top-200 station-hours containing empty-censoring | **45.89%** |
+| 95% interval, days resampled | 43.10% .. 48.11% (37 days, 43,029 station-hours) |
+| Band at the point and at the lower bound | **PROCEED**, both |
+| Excluded and counted | 8,627 low-coverage hours · 5,318 offline outages · 6,481 unobserved boundaries · 316 still open |
+
+The kill threshold was 2%. The lower bound is twenty times that. Nearly one in
+two hours at the stations everyone ranks first contains time with no bike to
+take, and every departure count for those hours is a floor, not a measurement.
+
+## M2-T1 — The §4 validation is built, and fixed before its data exists
+
+`analysis/validation.py`. Every choice a result could be steered by is in its
+docstring and committed before the run: the analysis window (2026-08-20 to
+2026-09-30), the never-stockout rule, donor matching on capacity and log
+departures, `em` as the judged estimator, and per-station error over censored
+hours as the unit.
+
+What makes it §4 rather than M2-T0 again: a donor's real outages are imposed on
+the held-out station's **real trip start times**, and the trips that actually
+started inside those minutes are removed. Nothing is assumed about how demand
+falls within the hour. That needed trip-level times, which the marts did not
+keep - `aggregate_trips.py` now writes `departures_YYYYMM.parquet` for months
+the outage record overlaps.
+
+A dry run on the real outage record with **random** trips (not a result, and not
+quotable) found **531** active never-stockout stations against the 100 required
+by M1 spec §6, so the cohort condition is not the obstacle. It also caught a
+bug that would have voided the run: `astype(int64) // 1e9` on pandas 2
+timestamps put every trip in January 1970, where no outage could hide it.
+
+The run waits for September's trips, published around 4 October.
