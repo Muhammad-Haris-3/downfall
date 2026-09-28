@@ -797,3 +797,16 @@
 {"ev":"close","st":"af72781c-fe0b-4b73-a7df-201f9780ea9c","k":"full","ts":1790572579,"run":"83fc0a125b5e"}
 {"ev":"close","st":"fb180cce-96ee-4e66-b3ce-000f3db6e670","k":"empty","ts":1790572579,"run":"83fc0a125b5e"}
 {"ev":"close","st":"66dddd28-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1790572579,"run":"83fc0a125b5e"}
+{"ev":"close","st":"66db8ca4-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1790572639,"run":"83fc0a125b5e"}
+{"ev":"open","st":"66db76a1-0aca-11e7-82f6-3863bb44ef7c","k":"offline","ts":1790572001,"run":"83fc0a125b5e"}
+{"ev":"close","st":"9ea2afff-a146-4824-89b6-39d5bdfac795","k":"full","ts":1790572879,"run":"83fc0a125b5e"}
+{"ev":"open","st":"2126225134412534550","k":"full","ts":1790573525,"run":"83fc0a125b5e"}
+{"ev":"open","st":"6c3b486e-603c-4158-91ac-adc06ac01535","k":"full","ts":1790573598,"run":"83fc0a125b5e"}
+{"ev":"close","st":"d2b23c87-b7c3-48c2-a634-db4b76ecbcf7","k":"empty","ts":1790573659,"run":"83fc0a125b5e"}
+{"ev":"close","st":"6c3b486e-603c-4158-91ac-adc06ac01535","k":"full","ts":1790573659,"run":"83fc0a125b5e"}
+{"ev":"open","st":"59f0cb81-e31b-4ba9-9159-3437c52f7505","k":"empty","ts":1790573694,"run":"83fc0a125b5e"}
+{"ev":"open","st":"f42b3158-3f78-4a62-964a-8cc554d69c35","k":"full","ts":1790573890,"run":"83fc0a125b5e"}
+{"ev":"close","st":"dba67615-a7e0-4c44-ab1b-b464033ec9b9","k":"full","ts":1790573899,"run":"83fc0a125b5e"}
+{"ev":"open","st":"f3525aa7-9d69-4ea2-9278-4df92db1afa1","k":"full","ts":1790573938,"run":"83fc0a125b5e"}
+{"ev":"open","st":"66dba0ba-0aca-11e7-82f6-3863bb44ef7c","k":"offline","ts":1790574000,"run":"83fc0a125b5e"}
+{"ev":"close","st":"66dba0ba-0aca-11e7-82f6-3863bb44ef7c","k":"empty","ts":1790574020,"run":"83fc0a125b5e"}
