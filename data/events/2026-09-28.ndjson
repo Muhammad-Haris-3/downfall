@@ -871,3 +871,12 @@
 {"ev":"open","st":"66dbeded-0aca-11e7-82f6-3863bb44ef7c","k":"full","ts":1790579041,"run":"5830c6fcb2f6"}
 {"ev":"open","st":"d55dd622-0ced-4e4d-9ea5-2ef2cb6481a9","k":"full","ts":1790579041,"run":"5830c6fcb2f6"}
 {"ev":"open","st":"18d980e5-ba08-4bc3-832e-03eb71865768","k":"full","ts":1790579172,"run":"5830c6fcb2f6"}
+{"ev":"close","st":"1838071008881986168","k":"full","ts":1790579599,"run":"5830c6fcb2f6"}
+{"ev":"close","st":"2178532501993068690","k":"offline","ts":1790579599,"run":"5830c6fcb2f6"}
+{"ev":"open","st":"2235290248874043146","k":"full","ts":1790580534,"run":"5830c6fcb2f6"}
+{"ev":"close","st":"edc9b877-c311-46b4-a780-59ee7e692324","k":"full","ts":1790580739,"run":"5830c6fcb2f6"}
+{"ev":"open","st":"77b21502-a7a2-40b4-8f3e-f9c6c6ef0939","k":"full","ts":1790580916,"run":"5830c6fcb2f6"}
+{"ev":"close","st":"77b21502-a7a2-40b4-8f3e-f9c6c6ef0939","k":"empty","ts":1790580919,"run":"5830c6fcb2f6"}
+{"ev":"close","st":"1880643645302280466","k":"full","ts":1790580919,"run":"5830c6fcb2f6"}
+{"ev":"open","st":"77b21502-a7a2-40b4-8f3e-f9c6c6ef0939","k":"empty","ts":1790581030,"run":"5830c6fcb2f6"}
+{"ev":"close","st":"77b21502-a7a2-40b4-8f3e-f9c6c6ef0939","k":"full","ts":1790581039,"run":"5830c6fcb2f6"}
