@@ -8701,7 +8701,7 @@
 "short": "4452.03"
 },
 "66db2a71-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 45,
+"cap": 0,
 "lat": 40.73172428,
 "lon": -74.00674436,
 "name": "Barrow St & Hudson St",
@@ -10115,7 +10115,7 @@
 "short": "6740.10"
 },
 "66dc7ba2-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 43,
+"cap": 42,
 "lat": 40.72938685,
 "lon": -73.97772429,
 "name": "E 14 St & Ave B",
@@ -10528,7 +10528,7 @@
 "short": "4883.03"
 },
 "66dce4fc-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 28,
+"cap": 29,
 "lat": 40.70411791,
 "lon": -73.94818595,
 "name": "Lorimer St & Broadway",
