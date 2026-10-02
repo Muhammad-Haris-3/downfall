@@ -1163,3 +1163,57 @@ timestamps put every trip in January 1970, where no outage could hide it.
 The run waits for September's trips, published around 4 October. It is run by
 the daily export job, once, and its result committed in the same push - so the
 first person to see it sees it in public.
+
+## M1-T5 — Empty time is concentrated: a tenth of stations hold nearly half of it
+
+`analysis/shape.py`, run 2026-10-02 over the full record (§3 floor met). Censored
+**time**, not outage counts, over every station with docks - including the 521
+that never ran empty, because dropping them answers a smaller question.
+
+| | stations | ever affected | Gini | top 1% | top 5% | top 10% |
+|---|---|---|---|---|---|---|
+| **empty** | 2,505 | 1,984 | **0.686** | 7.8% | 28.2% | **45.9%** |
+| **full** | 2,505 | 2,237 | 0.573 | 5.7% | 21.3% | 35.9% |
+
+Excluded and counted: 8,641 low-coverage hours · 5,939 offline outages ·
+6,788 unobserved boundaries · 403 still open.
+
+The bottom half of stations hold 3.1% of empty time. **Concentration is real and
+stronger than M0 saw**: the busiest 10% of *affected* stations hold 39.2% of empty
+time, against M0's ~25% of empty outages on one evening. Full is more spread,
+which matters for M4: a truck run can target empty stations; dock overflow is a
+network-wide problem.
+
+What M0 got wrong: it saw only 127 stations run empty. Over six weeks, 1,984 do.
+Almost every station runs out sometime; a small set runs out for most of the time.
+
+## M1-T6 — Full outnumbers empty in every hour of the week, but two to one, not four
+
+Hour-of-week in New York local time, outages that start per observed hour, both
+ends seen. Kaplan–Meier medians.
+
+| | empty/h | full/h | full:empty | median empty | median full |
+|---|---|---|---|---|---|
+| weekday night 00–06 | 35.8 | 87.6 | 2.44 | 43.1 min | 74.1 min |
+| weekday am peak 06–10 | 196.5 | 318.0 | 1.62 | 9.7 | 9.8 |
+| weekday midday 10–16 | 247.5 | 451.0 | 1.82 | 11.3 | 8.2 |
+| weekday pm peak 16–20 | 333.4 | 522.7 | 1.57 | 6.8 | 6.8 |
+| weekday evening 20–24 | 210.2 | 466.6 | 2.22 | 12.4 | 13.1 |
+| weekend night 00–06 | 40.3 | 143.0 | 3.54 | 30.2 | 41.8 |
+| weekend am 06–10 | 32.2 | 123.5 | 3.83 | 23.6 | 19.7 |
+| weekend midday 10–16 | 157.9 | 448.7 | 2.84 | 9.9 | 7.5 |
+| weekend pm 16–20 | 179.7 | 509.0 | 2.83 | 10.4 | 7.8 |
+| weekend evening 20–24 | 81.6 | 328.6 | 4.02 | 17.2 | 14.3 |
+
+**The M0 asymmetry is resolved, half each way.** Full outnumbers empty in **all
+168** hour-of-week slots (slot ratios 1.15 to 5.26), so the direction is a finding,
+not an evening artefact. The size is not: across the window it is **2.04 to 1**
+(327,740 against 161,010), and four to one appears only on weekend evenings and
+mornings. M0's "full lasts 40% longer" is retired: in daytime the medians are
+level or full is shorter, and full runs longer only overnight, when nobody is
+riding to clear it.
+
+Busy hours make outages short. The pm peak has the most outages and the shortest
+(6.8 min); nights have few and long. A night outage is a station nobody rebalanced;
+a peak outage is a station that will refill on its own within a publish cycle or
+two.
