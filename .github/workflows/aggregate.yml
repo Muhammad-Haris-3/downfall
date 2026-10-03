@@ -25,11 +25,14 @@ on:
         type: string
         default: ""
   schedule:
-    # Daily on the 3rd to the 10th. The lag is a median of ~3 days, not a
-    # promise: August 2026 was not up on 6 September, and a once-a-month cron
-    # would have left it unaggregated until 6 October. A month already done has
-    # a manifest and is skipped, so the repeat runs cost a bucket listing.
-    - cron: "40 5 3-10 * *"
+    # Every four hours, every day. The lag is not a promise and it is
+    # drifting: July 2026 appeared on 12 August, August on 10 September at
+    # 15:28 UTC - after that day's 05:40 run, on the last day of the old 3rd-10th
+    # window, so it would have waited a month. Uploads land in the afternoon
+    # UTC. A month already done has a manifest and is skipped, so the repeat
+    # runs cost a bucket listing. Four a day also survives GitHub dropping
+    # scheduled runs, which it did to this one on 3 October.
+    - cron: "40 */4 * * *"
 
 concurrency:
   group: downfall-aggregate

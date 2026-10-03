@@ -14,6 +14,11 @@ on:
   schedule:
     - cron: "41 6 * * *"
   workflow_dispatch:
+  # Straight after a new month lands, rather than up to a day later. This is
+  # how September's trips reach the §4 validation without anyone watching.
+  workflow_run:
+    workflows: [aggregate]
+    types: [completed]
 
 concurrency:
   group: downfall-export
