@@ -45,6 +45,8 @@ data/state/*
 !data/validation_preliminary.json
 # The ยง4 run. Committed by the export job the moment it exists.
 !data/validation_s4.json
+# The ง5 ranking run, with the per-station estimate it ranks by.
+!data/ranking_s5.json
 
 # Marts ARE tracked, despite being derived. Rebuilding one means pulling ~750 MB
 # from the bucket, so a repository that carries them is a repository someone can
