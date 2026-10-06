@@ -1217,3 +1217,67 @@ Busy hours make outages short. The pm peak has the most outages and the shortest
 (6.8 min); nights have few and long. A night outage is a station nobody rebalanced;
 a peak outage is a station that will refill on its own within a publish cycle or
 two.
+
+## M2-T2 — §4 PASSES: hidden demand is recoverable where the answer is known
+
+Run once by the export job, 2026-10-06 01:27 UTC, minutes after September's trips
+were aggregated, and committed in the same push (`data/validation_s4.json`).
+
+| method | median \|error\| | median signed | |
+|---|---|---|---|
+| naive (departures as demand) | 59.8% | −59.8% | fail |
+| scaled, D / (1 − f) | 32.0% | −27.4% | fail |
+| **em**, judged | **10.8%** | **+0.2%** | **PASS** |
+
+441 never-stockout stations scored (44 had no true departures in their censored
+hours and are counted, not scored), donor patterns from 1,833 stations, 30,948
+censored station-hours. Thresholds were ≤20% and within ±10%.
+
+Naive misses three-fifths of the departures in a censored hour, and `scaled`
+still misses over a quarter - both in the direction M2-T0 predicted, because
+stations run out in their busy minutes. `em` has essentially no lean.
+
+**The caveat that travels with every use of this:** the held-out stations are the
+quiet ones - median 452 departures over the window against 1,748 for the rest
+(M1-T7). `em` is validated on quiet stations and *applied* to busy ones.
+
+## M3-T1 — §5 SUPPORTED, but the top of the list barely moves
+
+`analysis/ranking.py`, rules committed (`1735b528`) before the run, run once.
+2,322 active stations, 944 usable hours, 2026-08-20 to 2026-10-01, ranked by
+observed departures and by `em`-estimated demand.
+
+| | |
+|---|---|
+| **Effect** | **+0.62 rank positions per censored hour** |
+| median station (11 censored h) | moves up 7 places relative to an uncensored one |
+| 90th percentile (100 censored h) | moves up 61 |
+| permutation p, one-sided, 10,000 shuffles | < 0.0001 (none matched) |
+| Spearman rho, exposure vs rank change | 0.777 |
+| hidden departures, network-wide | 271,180 of 6.42 M observed, **4.2%** |
+| top 50 / 100 / 200 by estimate, not in the same top-N by departures | **2 / 5 / 8** |
+
+The claim in §2 holds by the letter of §5. **What it means is narrower than the
+claim sounds**, and that is the finding:
+
+- **The direction was close to guaranteed.** `em` only ever adds demand to a
+  censored hour, so more censoring means more estimated demand. The p-value is a
+  weak gate here, as the script's docstring said before the run.
+- **The busiest stations do not reshuffle.** They are empty often, but they are
+  so far ahead on departures that 4% more demand does not change their order. A
+  list of the top 100 an operator would act on changes by five stations.
+- **The movement is in the middle and the tail.** Median absolute rank change is
+  7 places in the top 200, 16 in ranks 201–1,000, 21 below. The largest movers are
+  quiet stations empty for a third of the window, with estimated demand 40–80%
+  above observed: W 163 St & Edgecombe Ave (+340 places, 358 censored hours of
+  944), St Nicholas Ave & W 157 St (+263), Sheridan Ave & E 172 St (+237),
+  Broadway & W 165 St (+236), St Nicholas Ave & W 155 St (+222). That cluster is
+  upper Manhattan and the Bronx. It is recorded as an observation; whether
+  censoring falls unevenly by neighbourhood is M7's question, not this one's.
+
+§5 does not define "tiny", and no threshold was invented after the fact. Read
+plainly: correcting for censoring does not change **which stations are the
+busiest**. It does change **how under-counted the quiet, chronically empty ones
+are** - and those are the stations a departure-based ranking would never send a
+truck to. That extrapolates `em` furthest from where §4 tested it in one respect
+(heavy censoring) while matching it in another (quiet stations).

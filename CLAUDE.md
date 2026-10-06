@@ -14,8 +14,8 @@ an empty dock. That is why almost every published analysis of this dataset reads
 departures as demand, and why the central claim here has to be checkable rather
 than asserted — see `PREREGISTRATION.md` §4.
 
-**Status:** M0 complete, M1 in progress. Collection runs on GitHub Actions. No
-demand estimate exists and no station has been ranked.
+**Status:** M0, M1 complete. §4 validation PASSED and §5 ranking SUPPORTED (FINDINGS
+M2-T2, M3-T1). Collection runs on GitHub Actions. Next: M4 decision layer.
 
 **Collection cadence:** one job runs up to 350 minutes (platform cap is 360),
 committing a checkpoint every 30 minutes, with the cron firing hourly purely as
