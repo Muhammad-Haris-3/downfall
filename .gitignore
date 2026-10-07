@@ -47,6 +47,8 @@ data/state/*
 !data/validation_s4.json
 # The §5 ranking run, with the per-station estimate it ranks by.
 !data/ranking_s5.json
+# The busy-station check, designed after §4/§5. Labelled as such inside.
+!data/busy_check.json
 
 # Marts ARE tracked, despite being derived. Rebuilding one means pulling ~750 MB
 # from the bucket, so a repository that carries them is a repository someone can
