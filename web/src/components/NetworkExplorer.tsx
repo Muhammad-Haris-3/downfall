@@ -9,6 +9,8 @@ export type Station = {
   cap: number | null; dep: number; arr: number; rank: number; top200: boolean;
   /** Present only once the §3 floor is met. */
   empty_h?: number; watched_h?: number;
+  /** Present only once §4 has passed. Six-week window, with its own count and ranks. */
+  est?: { obs: number; est: number; r_obs: number; r_est: number; cens_h: number };
 };
 export type Profiles = Record<string, { dep: number[]; arr: number[] }>;
 

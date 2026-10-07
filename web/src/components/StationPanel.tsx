@@ -158,16 +158,37 @@ export default function StationPanel({
           </div>
           <div className="card">
             <div className="k">Estimated true demand</div>
-            <div className="v" style={{ color: "var(--dim)" }}>—</div>
-            <div className="d">Not published. Needs an estimator that has passed §4.</div>
+            {station.est ? (
+              <>
+                <div className="v">
+                  {station.est.est > station.est.obs
+                    ? `+${((100 * (station.est.est - station.est.obs)) / Math.max(station.est.obs, 1)).toFixed(1)}%`
+                    : "+0%"}
+                </div>
+                <div className="d">
+                  {station.est.est.toLocaleString()} departures estimated against{" "}
+                  {station.est.obs.toLocaleString()} recorded, 20 Aug – 30 Sep. Rank{" "}
+                  {Math.round(station.est.r_obs)} by trips recorded,{" "}
+                  {Math.round(station.est.r_est)} by estimated demand.
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="v" style={{ color: "var(--dim)" }}>—</div>
+                <div className="d">No estimate: the station was not active over the six-week window.</div>
+              </>
+            )}
           </div>
         </div>
 
         <div className="note" style={{ marginTop: 26 }}>
           <strong>The last two cards are the project.</strong> Everything the
           trip archive alone can tell you sits above them, and none of it says
-          how many people wanted a bike here and did not get one. That number is
-          not small, it is not random, and it is in no published dataset.
+          how many people wanted a bike here and did not get one. The estimate
+          passed a test fixed before it was run - a median error of 10.8% where
+          the true answer was known - and counts departures that would have
+          happened from a stocked dock. It cannot count anyone who checked the
+          app, saw an empty station and stayed home.
         </div>
       </div>
     </div>

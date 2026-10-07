@@ -101,11 +101,13 @@ export default function Method() {
         <h2 style={{ marginBottom: 24 }}>What is not established</h2>
 
         <div className="note" style={{ marginBottom: 30 }}>
-          <strong>No demand estimate exists and no station has been ranked.</strong>{" "}
-          Nothing on this site describes any station as under-served, because the
-          estimator has not been validated. The coverage floor has been met, so
-          hours each station spent empty are published; the validation threshold
-          was set before the data existed and has not yet been run.
+          <strong>The estimate passed, and it moves the quiet stations, not the busy ones.</strong>{" "}
+          The validation fixed before the data existed was run once: a median
+          error of 10.8% with no lean, against a bar of 20%. Correcting for empty
+          time adds 4.2% to departures network-wide and changes only five of the
+          top 100 stations. The large moves are quiet stations that were empty a
+          third of the time, whose estimated demand is 40–80% above what was
+          recorded. Estimates cover 20 August to 30 September only.
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 20 }}>

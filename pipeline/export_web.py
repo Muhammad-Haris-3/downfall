@@ -18,8 +18,10 @@ WHAT THIS FILE MAY AND MAY NOT SAY
 ----------------------------------
 Everything here is OBSERVED demand: departures that happened. That is precisely
 the quantity the project exists to argue is wrong, so nothing exported here is
-labelled "demand" without qualification, and no field is named `true_demand`
-until an estimate exists that has passed PREREGISTRATION.md §4.
+labelled "demand" without qualification - EXCEPT the `est` block, which is
+written only when data/validation_s4.json says PASS and data/ranking_s5.json
+exists. Both are read, never recomputed here: the site shows the run that was
+committed, not a fresh one that could quietly differ from it.
 
 Usage:  python pipeline/export_web.py
 """
@@ -39,6 +41,8 @@ from analysis.exposure import REQUIRED_DAYS, floor_status           # noqa: E402
 MARTS = ROOT / "data" / "marts"
 STATIONS = ROOT / "data" / "stations.json"
 COHORT = ROOT / "data" / "cohort_top200.json"
+VALIDATION = ROOT / "data" / "validation_s4.json"
+RANKING = ROOT / "data" / "ranking_s5.json"
 PUBLIC = ROOT / "web" / "public" / "data"
 BUILD = ROOT / "web" / "data"
 
@@ -102,6 +106,29 @@ def hours_empty():
     return {k: round(v / 3600, 1) for k, v in by_short.items()}, window
 
 
+def estimates():
+    """The §5 per-station estimate, or (None, None) unless §4 passed.
+
+    The estimate covers the §4 window (six weeks), not the twelve months the
+    map's departures come from, so it travels with its own observed count and
+    its own ranks. Setting six-week estimated demand beside twelve-month
+    departures would make every station look under-counted by a factor of eight.
+    """
+    if not (VALIDATION.exists() and RANKING.exists()):
+        return None, None
+    if json.loads(VALIDATION.read_text()).get("verdict") != "PASS":
+        return None, None
+    r = json.loads(RANKING.read_text())
+    by_short = {p["short"]: {"obs": p["departures"], "est": round(p["estimated"]),
+                             "r_obs": p["rank_naive"], "r_est": p["rank_est"],
+                             "cens_h": p["censored_h"]}
+                for p in r["per_station"]}
+    meta = {"from": datetime.fromtimestamp(r["window"][0], timezone.utc).date().isoformat(),
+            "to": datetime.fromtimestamp(r["window"][1] - 1, timezone.utc).date().isoformat(),
+            "stations": r["stations"]}
+    return by_short, meta
+
+
 def main():
     PUBLIC.mkdir(parents=True, exist_ok=True)
     BUILD.mkdir(parents=True, exist_ok=True)
@@ -147,6 +174,10 @@ def main():
     print("  hours empty: " + ("floor not met, left blank" if window is None
                                else "{from} to {to}".format(**window)))
 
+    est, est_window = estimates()
+    print("  estimate: " + ("§4 not passed, left blank" if est is None
+                            else "{from} to {to}".format(**est_window)))
+
     network, profiles, unresolved = [], {}, 0
     for short, row in totals.iterrows():
         info = by_short.get(short)
@@ -172,6 +203,8 @@ def main():
             # A station never seen empty has no row, and that is a measured 0.
             network[-1]["empty_h"] = empty.get(short, 0.0)
             network[-1]["watched_h"] = window["watched_h"]
+        if est is not None and short in est:
+            network[-1]["est"] = est[short]
         profiles[short] = {
             "dep": [int(x) for x in prof_dep],
             "arr": [int(x) for x in prof_arr],
@@ -193,6 +226,7 @@ def main():
                    "ran out of bikes. Correcting for that is the project's "
                    "subject and no correction is applied here."),
         "outage_window": window,
+        "estimate_window": est_window,
         "network": network,
     }
     (PUBLIC / "network.json").write_text(json.dumps(payload, separators=(",", ":")))
