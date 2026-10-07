@@ -2121,7 +2121,7 @@
 "short": "HB609"
 },
 "1845676816555735590": {
-"cap": 24,
+"cap": 0,
 "lat": 40.65106,
 "lon": -73.94193,
 "name": "E 38 St & Church Ave",
@@ -6657,7 +6657,7 @@
 "short": "8601.04"
 },
 "2f580cf9-14e2-4300-ba22-f6d88d0312a5": {
-"cap": 27,
+"cap": 26,
 "lat": 40.665816,
 "lon": -73.956934,
 "name": "Bedford Ave & Montgomery St",
@@ -9393,13 +9393,6 @@
 "name": "E 11 St & Broadway",
 "short": "5829.12"
 },
-"66dbc8f5-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 74,
-"lat": 40.73291553,
-"lon": -74.00711384,
-"name": "Christopher St & Greenwich St",
-"short": "5847.01"
-},
 "66dbc982-0aca-11e7-82f6-3863bb44ef7c": {
 "cap": 81,
 "lat": 40.75510267,
@@ -9779,7 +9772,7 @@
 "short": "5093.01"
 },
 "66dc1beb-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 107,
+"cap": 96,
 "lat": 40.72740794,
 "lon": -73.98142006,
 "name": "E 10 St & Ave A",
@@ -10073,7 +10066,7 @@
 "short": "6055.08"
 },
 "66dc7802-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 54,
+"cap": 72,
 "lat": 40.73221853,
 "lon": -73.98165557,
 "name": "1 Ave & E 16 St",
@@ -14707,7 +14700,7 @@
 "short": "6158.06"
 },
 "afd76a0e-ceb8-4d18-a427-b378c4d07a75": {
-"cap": 21,
+"cap": 29,
 "lat": 40.702709,
 "lon": -73.99253,
 "name": "Dock St & Front St",
