@@ -1,0 +1,25 @@
+{
+ "label": "extra check, designed after \u00a74/\u00a75 were seen",
+ "stations_used": 182,
+ "synthetic_hours": 9410,
+ "results": {
+  "naive": {
+   "stations_scored": 182,
+   "stations_unscorable": 0,
+   "median_abs_pct": 22.41036878893941,
+   "median_signed_pct": -22.41036878893941
+  },
+  "scaled": {
+   "stations_scored": 182,
+   "stations_unscorable": 0,
+   "median_abs_pct": 2.211676029384526,
+   "median_signed_pct": -0.5614420457537951
+  },
+  "em": {
+   "stations_scored": 182,
+   "stations_unscorable": 0,
+   "median_abs_pct": 3.642898623902081,
+   "median_signed_pct": 1.9311540950690265
+  }
+ }
+}

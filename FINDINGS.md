@@ -1281,3 +1281,31 @@ busiest**. It does change **how under-counted the quiet, chronically empty ones
 are** - and those are the stations a departure-based ranking would never send a
 truck to. That extrapolates `em` furthest from where §4 tested it in one respect
 (heavy censoring) while matching it in another (quiet stations).
+
+## M3-T2 — `em` holds at the busy stations too (an extra check, labelled as one)
+
+`analysis/busy_check.py`. **Designed after §4 and §5 were seen**, committed before
+it was run, and unable to rescue or overturn either. It asks how far the §4 result
+carries from quiet stations to busy ones.
+
+Each top-200 station's own fully observed empty outages were moved one week onto
+hours where it never ran out, and the trips that really started in those minutes
+removed. 182 of 200 stations had outages that landed cleanly: 9,410 hours, 29,477
+of 124,939 departures hidden.
+
+| method | median \|error\| | median signed |
+|---|---|---|
+| naive | 22.4% | −22.4% |
+| scaled | 2.2% | −0.6% |
+| **em** | **3.6%** | **+1.9%** |
+
+`em` is well inside the §4 thresholds at the busy stations as well, with no
+material lean. The extrapolation caveat in M2-T2 is narrowed: on the stations §4
+could not test, the estimator is at least as accurate as on the ones it could.
+
+Two things recorded rather than smoothed over. **`scaled` does slightly better
+here**, unlike in §4 - busy stations run out in short bursts inside busy hours,
+where demand is close to even and dividing by (1 − f) is nearly right. That does
+not change the judged estimator, which was fixed before any of this. And a week
+that did not run out may have been a slightly quieter week, so the truth here
+leans quiet, not busy.
