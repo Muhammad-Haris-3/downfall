@@ -9849,7 +9849,7 @@
 "short": "6948.10"
 },
 "66dc22a7-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 0,
+"cap": 45,
 "lat": 40.751396,
 "lon": -74.005226,
 "name": "11 Ave & W 27 St",
@@ -12022,7 +12022,7 @@
 "cap": 36,
 "lat": 40.799484,
 "lon": -73.955613,
-"name": "Central Park North & Adam Clayton Powell Blvd",
+"name": "Central Park N & Adam Clayton Powell Blvd",
 "short": "7617.07"
 },
 "66de269c-0aca-11e7-82f6-3863bb44ef7c": {
@@ -15060,7 +15060,7 @@
 "cap": 81,
 "lat": 40.7667405590595,
 "lon": -73.9790689945221,
-"name": "7 Ave & Central Park South",
+"name": "7 Ave & Central Park S",
 "short": "6912.01"
 },
 "b94d0241-bce7-44a9-ab1c-ece0740a4134": {
