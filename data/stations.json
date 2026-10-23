@@ -567,7 +567,7 @@
 "short": "5788.15"
 },
 "0f51cb84-e386-44ac-947f-a969f7617d17": {
-"cap": 24,
+"cap": 36,
 "lat": 40.797520781247556,
 "lon": -73.9489397406578,
 "name": "W 111 St & 5 Ave",
@@ -5375,13 +5375,6 @@
 "name": "8 Ave & W 55 St",
 "short": "6884.06"
 },
-"2216026000804919888": {
-"cap": 23,
-"lat": 40.69804052908624,
-"lon": -73.97148517679594,
-"name": "Flushing Ave & Clermont Ave",
-"short": "4804.03"
-},
 "2218569564729174336": {
 "cap": 30,
 "lat": 40.719445793042716,
@@ -8120,7 +8113,7 @@
 "short": "8547.04"
 },
 "57f144cb-375d-4eee-b458-e288116cb8f7": {
-"cap": 21,
+"cap": 0,
 "lat": 40.73565914819229,
 "lon": -73.93478840589523,
 "name": "Bradley Ave & Greenpoint Ave",
@@ -9205,7 +9198,7 @@
 "short": "5359.11"
 },
 "66db7a71-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 39,
+"cap": 0,
 "lat": 40.69991755,
 "lon": -73.98971773,
 "name": "Cadman Plaza E & Red Cross Pl",
@@ -9322,6 +9315,13 @@
 "lon": -73.98016555,
 "name": "Columbia St & Rivington St",
 "short": "5365.02"
+},
+"66dba303-0aca-11e7-82f6-3863bb44ef7c": {
+"cap": 23,
+"lat": 40.69794,
+"lon": -73.96986848,
+"name": "Clinton Ave & Flushing Ave",
+"short": "4762.04"
 },
 "66dbb869-0aca-11e7-82f6-3863bb44ef7c": {
 "cap": 23,
@@ -9905,7 +9905,7 @@
 "short": "6779.05"
 },
 "66dc36c3-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 84,
+"cap": 78,
 "lat": 40.74345335,
 "lon": -74.00004031,
 "name": "W 20 St & 8 Ave",
@@ -12019,7 +12019,7 @@
 "short": "4028.03"
 },
 "66de2625-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 36,
+"cap": 51,
 "lat": 40.799484,
 "lon": -73.955613,
 "name": "Central Park N & Adam Clayton Powell Blvd",
@@ -14973,7 +14973,7 @@
 "short": "HB608"
 },
 "b6a4770e-9077-4a0e-a0fb-b45b1d457559": {
-"cap": 61,
+"cap": 60,
 "lat": 40.72840059450829,
 "lon": -73.99968780577183,
 "name": "Thompson St & Bleecker St",
