@@ -8582,7 +8582,7 @@
 "short": "4450.06"
 },
 "64f0f28c-bedc-42d5-b107-ecdd48fc30cd": {
-"cap": 103,
+"cap": 78,
 "lat": 40.76017739537783,
 "lon": -73.98486793041229,
 "name": "Broadway & W 48 St",
@@ -8953,7 +8953,7 @@
 "short": "5914.03"
 },
 "66db4351-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 1,
+"cap": 79,
 "lat": 40.71939226,
 "lon": -74.00247214,
 "name": "Lispenard St & Broadway",
@@ -11235,7 +11235,7 @@
 "short": "JC023"
 },
 "66dd8043-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 18,
+"cap": 17,
 "lat": 40.742677141,
 "lon": -74.051788633,
 "name": "Pershing Field",
@@ -14987,7 +14987,7 @@
 "short": "HB608"
 },
 "b6a4770e-9077-4a0e-a0fb-b45b1d457559": {
-"cap": 60,
+"cap": 61,
 "lat": 40.72840059450829,
 "lon": -73.99968780577183,
 "name": "Thompson St & Bleecker St",
