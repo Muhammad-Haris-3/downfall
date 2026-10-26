@@ -1260,7 +1260,7 @@
 "short": "3229.07"
 },
 "1815968422007427668": {
-"cap": 0,
+"cap": 22,
 "lat": 40.64535,
 "lon": -73.93268,
 "name": "Schenectady Ave & Cortelyou Rd",
@@ -5754,7 +5754,7 @@
 "short": "6233.11"
 },
 "2241933651126795842": {
-"cap": 50,
+"cap": 74,
 "lat": 40.7326,
 "lon": -74.00767,
 "name": "Greenwich St & Christopher St",
@@ -8582,7 +8582,7 @@
 "short": "4450.06"
 },
 "64f0f28c-bedc-42d5-b107-ecdd48fc30cd": {
-"cap": 78,
+"cap": 103,
 "lat": 40.76017739537783,
 "lon": -73.98486793041229,
 "name": "Broadway & W 48 St",
@@ -11627,7 +11627,7 @@
 "short": "7524.09"
 },
 "66ddeb67-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 27,
+"cap": 26,
 "lat": 40.6861758,
 "lon": -73.99645295,
 "name": "Kane St & Clinton St",
@@ -16660,7 +16660,7 @@
 "short": "7691.05"
 },
 "ded4386f-9f69-43c6-a566-4511920c3e39": {
-"cap": 22,
+"cap": 16,
 "lat": 40.74313993965626,
 "lon": -74.04004096984863,
 "name": "Mama Johnson Field - 4 St & Jackson St",
