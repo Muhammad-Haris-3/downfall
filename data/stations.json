@@ -14224,7 +14224,7 @@
 "short": "6128.04"
 },
 "9e3603ee-2b7d-4147-a7b5-48bbd778902c": {
-"cap": 63,
+"cap": 56,
 "lat": 40.71779817737835,
 "lon": -73.99316132068634,
 "name": "Forsyth St & Grand St",
@@ -15442,7 +15442,7 @@
 "short": "7567.06"
 },
 "c066c90a-efb1-4f8b-aa15-38ba4edd4ebc": {
-"cap": 20,
+"cap": 0,
 "lat": 40.67686,
 "lon": -73.93607,
 "name": "Pacific St & Troy Ave",
