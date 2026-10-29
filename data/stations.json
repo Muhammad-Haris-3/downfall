@@ -3507,7 +3507,7 @@
 "short": "4778.03"
 },
 "1947313784686131504": {
-"cap": 3,
+"cap": 4,
 "lat": 40.79322,
 "lon": -73.92396,
 "name": "Icahn Stadium Plaza",
@@ -4137,7 +4137,7 @@
 "short": "JC124"
 },
 "2108373961268485100": {
-"cap": 14,
+"cap": 35,
 "lat": 40.704503,
 "lon": -74.07721,
 "name": "Arlington Ave & Wilkinson Ave",
@@ -4256,7 +4256,7 @@
 "short": "3056.07"
 },
 "2121032507515216178": {
-"cap": 12,
+"cap": 0,
 "lat": 40.64369,
 "lon": -73.97163,
 "name": "E 8 St & Beverley Rd",
@@ -7413,7 +7413,7 @@
 "short": "2923.01"
 },
 "44a80c48-c1a9-4ff1-92eb-6bf8be492f5e": {
-"cap": 1,
+"cap": 23,
 "lat": 40.67154,
 "lon": -73.91433,
 "name": "Park Pl & Thomas S. Boyland St",
@@ -14014,7 +14014,7 @@
 "short": "3665.06"
 },
 "989fdf95-cfb9-475c-ba0c-3152fd3a16e0": {
-"cap": 21,
+"cap": 0,
 "lat": 40.651654,
 "lon": -73.981231,
 "name": "McDonald Ave & Vanderbilt St",
@@ -15776,13 +15776,6 @@
 "lon": -73.93642,
 "name": "Troy Ave & Park Pl",
 "short": "3934.07"
-},
-"c7ffe3fa-9cd6-4d35-9060-7d5822381442": {
-"cap": 0,
-"lat": 40.733208626522426,
-"lon": -73.9756813647,
-"name": "E 20 St & FDR Dr",
-"short": "5886.13"
 },
 "c8060816-b4aa-4fd9-bc66-af28bf61dc87": {
 "cap": 21,
