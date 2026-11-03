@@ -4130,7 +4130,7 @@
 "short": "JC124"
 },
 "2108373961268485100": {
-"cap": 35,
+"cap": 14,
 "lat": 40.704503,
 "lon": -74.07721,
 "name": "Arlington Ave & Wilkinson Ave",
@@ -5685,10 +5685,10 @@
 },
 "2235294222661977076": {
 "cap": 0,
-"lat": 40.66363,
-"lon": -73.90231,
-"name": "Livonia Ave & Powell St",
-"short": "3678.05"
+"lat": 40.66366,
+"lon": -73.90236,
+"name": "Powell St & Livonia Ave",
+"short": "3678.06"
 },
 "2235294316208072496": {
 "cap": 16,
@@ -17003,7 +17003,7 @@
 "short": "3871.02"
 },
 "eb217a2c-1dd0-4690-a34e-ecc1a708f883": {
-"cap": 20,
+"cap": 19,
 "lat": 40.637033,
 "lon": -74.022141,
 "name": "4 Ave & Shore Road Dr",
