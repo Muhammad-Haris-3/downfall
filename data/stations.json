@@ -742,7 +742,7 @@
 "short": "7020.02"
 },
 "145bbc0d-8976-45ae-9565-158ba564d3d1": {
-"cap": 27,
+"cap": 26,
 "lat": 40.702013,
 "lon": -73.923769,
 "name": "Suydam St & Knickerbocker Ave",
@@ -7252,7 +7252,7 @@
 "short": "3538.09"
 },
 "3f05490b-a3d8-4d15-bd25-0212555b5dff": {
-"cap": 0,
+"cap": 23,
 "lat": 40.649037,
 "lon": -73.97673,
 "name": "Fort Hamilton Pkwy & E 5 St",
@@ -8078,7 +8078,7 @@
 "short": "5027.02"
 },
 "5736cd70-be41-483e-8d82-721874f40e6e": {
-"cap": 0,
+"cap": 20,
 "lat": 40.67297,
 "lon": -73.93896,
 "name": "Albany Ave & Park Pl",
@@ -9212,7 +9212,7 @@
 "short": "4596.09"
 },
 "66db89a3-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 74,
+"cap": 0,
 "lat": 40.689888,
 "lon": -73.981013,
 "name": "DeKalb Ave & Hudson Ave",
@@ -9639,7 +9639,7 @@
 "short": "5506.14"
 },
 "66dbf518-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 29,
+"cap": 44,
 "lat": 40.7158155,
 "lon": -73.99422366,
 "name": "Forsyth St & Canal St",
@@ -11228,7 +11228,7 @@
 "short": "JC023"
 },
 "66dd8043-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 17,
+"cap": 18,
 "lat": 40.742677141,
 "lon": -74.051788633,
 "name": "Pershing Field",
@@ -14217,7 +14217,7 @@
 "short": "6128.04"
 },
 "9e3603ee-2b7d-4147-a7b5-48bbd778902c": {
-"cap": 63,
+"cap": 81,
 "lat": 40.71779817737835,
 "lon": -73.99316132068634,
 "name": "Forsyth St & Grand St",
@@ -16457,7 +16457,7 @@
 "short": "4014.01"
 },
 "d9bc0b3e-1af8-4cb6-a082-8ef1245ef329": {
-"cap": 23,
+"cap": 29,
 "lat": 40.8013066,
 "lon": -73.9398167,
 "name": "Lexington Ave & E 120 St",
@@ -16646,7 +16646,7 @@
 "short": "7691.05"
 },
 "ded4386f-9f69-43c6-a566-4511920c3e39": {
-"cap": 16,
+"cap": 22,
 "lat": 40.74313993965626,
 "lon": -74.04004096984863,
 "name": "Mama Johnson Field - 4 St & Jackson St",
