@@ -7363,6 +7363,13 @@
 "name": "Crotona Park East & E 173 St",
 "short": "8182.02"
 },
+"4281e975-6bc2-483f-9e4a-f7c09b67ed28": {
+"cap": 19,
+"lat": 40.73443564069459,
+"lon": -73.93790781497955,
+"name": "Van Dam St & Greenpoint Ave",
+"short": "5883.06"
+},
 "42bf7170-61ab-44a0-aafe-1b89d7271718": {
 "cap": 30,
 "lat": 40.659945,
@@ -7544,6 +7551,13 @@
 "lon": -73.935856,
 "name": "5 Ave & W 139 St",
 "short": "7851.04"
+},
+"479befd9-61f0-4524-a61c-fcb9283fce7e": {
+"cap": 55,
+"lat": 40.7103231,
+"lon": -74.0043228,
+"name": "Spruce St & Gold St",
+"short": "5137.13"
 },
 "47bcbcc1-9241-4e65-99f1-07c15543be1b": {
 "cap": 31,
