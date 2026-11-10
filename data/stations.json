@@ -2562,7 +2562,7 @@
 "short": "8335.02"
 },
 "1860187301567054286": {
-"cap": 0,
+"cap": 20,
 "lat": 40.84234,
 "lon": -73.89409,
 "name": "Crotona Ave & Crotona Park N",
@@ -6818,7 +6818,7 @@
 "short": "JC108"
 },
 "33af8810-cda5-4b61-9c38-0235f9d59aaa": {
-"cap": 24,
+"cap": 0,
 "lat": 40.654144,
 "lon": -74.00422,
 "name": "36 St & 4 Ave",
@@ -9170,7 +9170,7 @@
 "short": "5484.09"
 },
 "66db74a5-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 39,
+"cap": 55,
 "lat": 40.69610226,
 "lon": -73.96751037,
 "name": "Washington Ave & Park Ave",
@@ -14546,7 +14546,7 @@
 "short": "7453.01"
 },
 "a958a8af-a0cc-4bca-9114-93c74ce3c693": {
-"cap": 22,
+"cap": 9,
 "lat": 40.71882,
 "lon": -73.93948,
 "name": "Frost St & Debevoise Ave",
