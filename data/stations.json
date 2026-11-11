@@ -9058,7 +9058,7 @@
 "short": "6072.06"
 },
 "66db6387-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 114,
+"cap": 113,
 "lat": 40.73454567,
 "lon": -73.99074142,
 "name": "Broadway & E 14 St",
@@ -11403,7 +11403,7 @@
 "short": "JC078"
 },
 "66ddd8a8-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 10,
+"cap": 14,
 "lat": 40.72601172964625,
 "lon": -74.05038893222809,
 "name": "Brunswick & 6th",
@@ -12236,7 +12236,7 @@
 "short": "4404.10"
 },
 "66de5773-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 17,
+"cap": 18,
 "lat": 40.6853761,
 "lon": -73.98302136,
 "name": "Pacific St & Nevins St",
@@ -12348,7 +12348,7 @@
 "short": "5382.06"
 },
 "66de867e-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 35,
+"cap": 51,
 "lat": 40.721319,
 "lon": -74.010065,
 "name": "Greenwich St & Hubert St",
@@ -12782,7 +12782,7 @@
 "short": "4807.02"
 },
 "74f913d2-6eac-49ce-bd6d-53a06fa855a6": {
-"cap": 0,
+"cap": 22,
 "lat": 40.67113,
 "lon": -73.94222,
 "name": "St Johns Pl & Kingston Ave",
