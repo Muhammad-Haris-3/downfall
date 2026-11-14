@@ -9219,7 +9219,7 @@
 "short": "4821.06"
 },
 "66db88f5-0aca-11e7-82f6-3863bb44ef7c": {
-"cap": 6,
+"cap": 63,
 "lat": 40.69236178,
 "lon": -73.98631746,
 "name": "Lawrence St & Willoughby St",
@@ -12633,13 +12633,6 @@
 "lon": -73.911759,
 "name": "Brook Ave & E 157 St",
 "short": "7935.07"
-},
-"6f484a9d-c535-451e-a18f-f3afdc0a27af": {
-"cap": 40,
-"lat": 40.71069995,
-"lon": -74.00354147,
-"name": "Gold St & Frankfort St",
-"short": "5137.12"
 },
 "6fab98b7-b06a-49d8-a4d1-087ffce0ebcf": {
 "cap": 19,
