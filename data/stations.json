@@ -119,7 +119,7 @@
 "short": "7769.06"
 },
 "023cf549-bd85-4f9a-abd8-70ba29d7e86b": {
-"cap": 21,
+"cap": 20,
 "lat": 40.851788,
 "lon": -73.916418,
 "name": "W Tremont Ave & Montgomery Ave",
@@ -5754,7 +5754,7 @@
 "short": "6585.04"
 },
 "2245650716933709032": {
-"cap": 104,
+"cap": 105,
 "lat": 40.729738,
 "lon": -73.991618,
 "name": "Lafayette St & Astor Pl",
